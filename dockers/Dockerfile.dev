@@ -1,0 +1,71 @@
+FROM althack/ros2:jazzy-full
+
+# install utils
+ENV DEBIAN_FRONTEND=noninteractive
+ENV COM_RCL_EXCEPT=4
+ENV PYTHONOPTIMIZE=1
+ENV LIBGL_ALWAYS_SOFTWARE=0
+ENV ROS_DISTRO=jazzy
+
+RUN apt-get update && apt-get install -y \
+  bash-completion \
+  build-essential \
+  cmake \
+  gdb \
+  git \
+  python3-argcomplete \
+  python3-pip \
+  nano \
+  wget \
+  curl \
+  autoconf \
+  automake \
+  libtool \
+  make \
+  g++ \
+  unzip \
+  sudo \ 
+  lsb-release \
+  openssh-server \
+  gnupg \
+  gdb-multiarch \
+  default-jre \
+  python3 \
+  python3-setuptools \
+  python3-vcstool \
+  python3-colcon-common-extensions \
+  python3-rosdep \
+  mesa-utils \
+  x11-apps \
+  libcanberra-gtk* \
+  libglfw3-dev \
+  libglew-dev \
+  libgl1-mesa-dri \
+  ros-${ROS_DISTRO}-foxglove-bridge \
+  ros-${ROS_DISTRO}-rmw-fastrtps-cpp \
+  python3-vcstool python3-rosinstall-generator python3-osrf-pycommon libasio-dev\
+  python3-venv \
+  && rm -rf /var/lib/apt/lists/* \
+  && echo "source /usr/share/bash-completion/completions/git" >> /home/$USERNAME/.bashrc
+
+RUN python3 -m venv /venv
+RUN . /venv/bin/activate && pip install xmltodict empy pyros-genmsg setuptools pyyaml mcap matplotlib protobuf rosbags tqdm==4.66.4 docker opencv-python colcon-common-extensions vcstool
+
+RUN usermod -a -G video ros
+
+RUN mkdir -p /ros2_ws/src && cd /ros2_ws/ &&  \
+    . /venv/bin/activate && \
+    wget https://raw.githubusercontent.com/eProsima/Fast-DDS/master/fastdds.repos && \
+    vcs import src < fastdds.repos && \
+    colcon build --packages-up-to fastdds
+
+## Configure workspace for PX4 - ROS 2 packages
+RUN cd /ros2_ws/src && \
+    git clone -b 2.5.0 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
+    bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash"  && \
+    . /venv/bin/activate && \
+    colcon build --packages-up-to microxrcedds_agent
+
+# Set up auto-source of workspace for ros user
+ARG WORKSPACE
+RUN echo "if [ -f ${WORKSPACE}/install/setup.bash ]; then source ${WORKSPACE}/install/setup.bash; fi" >> /home/ros/.bashrc
