@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/opt/ros/jazzy/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/examples/cpp/modes/executor_with_multiple_modes/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/examples/cpp/modes/fw_attitude/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/examples/cpp/modes/goto/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/examples/cpp/modes/goto_global/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/examples/cpp/modes/manual/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/examples/cpp/modes/mode_with_executor/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/examples/cpp/modes/rtl_replacement/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/examples/cpp/navigation/global_navigation/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/examples/cpp/navigation/local_navigation/include/**",
+        "/workspaces/px4_sitl_on_aws/src/px4-ros2-interface-lib/px4_ros2_cpp/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

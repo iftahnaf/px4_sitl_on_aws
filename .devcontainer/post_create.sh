@@ -25,6 +25,7 @@ make px4_sitl
 echo "Building ROS workspace"
 cd $WORKSPACE_DIR/src
 git submodule update --init --recursive
+cd ..
 colcon build
 echo "source ${WORKSPACE_DIR}install/local_setup.bash" >> ~/.bashrc
 
