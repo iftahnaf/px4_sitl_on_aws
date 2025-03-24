@@ -53,19 +53,18 @@ RUN . /venv/bin/activate && pip install xmltodict empy pyros-genmsg setuptools p
 
 RUN usermod -a -G video ros
 
-RUN mkdir -p /ros2_ws/src && cd /ros2_ws/ &&  \
-    . /venv/bin/activate && \
-    wget https://raw.githubusercontent.com/eProsima/Fast-DDS/master/fastdds.repos && \
-    vcs import src < fastdds.repos && \
-    colcon build --packages-up-to fastdds
 
 ## Configure workspace for PX4 - ROS 2 packages
-RUN cd /ros2_ws/src && \
-    git clone -b 2.5.0 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
-    bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash"  && \
-    . /venv/bin/activate && \
-    colcon build --packages-up-to microxrcedds_agent
-
+RUN mkdir -p /ros2_ws/src && cd /ros2_ws/src && \
+    git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
+    cd Micro-XRCE-DDS-Agent && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make && \
+    sudo make install && \
+    sudo ldconfig /usr/local/lib/
+    
 # Set up auto-source of workspace for ros user
 ARG WORKSPACE
 RUN echo "if [ -f ${WORKSPACE}/install/setup.bash ]; then source ${WORKSPACE}/install/setup.bash; fi" >> /home/ros/.bashrc
