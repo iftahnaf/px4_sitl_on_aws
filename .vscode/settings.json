@@ -6,5 +6,33 @@
     "python.analysis.extraPaths": [
         "/opt/ros/jazzy/local/lib/python3.12/dist-packages",
         "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "VsCodeTaskButtons.showCounter": false,
+    "VsCodeTaskButtons.tasks": [
+        {
+            "label": "$(debug-configure)Build",
+            "task": "build",
+            "tooltip": "Build ROS 2 workspace"
+        },
+        {
+            "label": "$(notebook-execute)Run Simulation",
+            "task": "run-simulation",
+            "tooltip": "Run simulation"
+        },
+        {
+            "label": "$(tasks-remove)Terminate",
+            "task": "kill-simulation",
+            "tooltip": "Terminate the simulation resources"
+        },
+        {
+            "label": "$(debug-breakpoint-function)Arm",
+            "task": "arm",
+            "tooltip": "Arm the interceptor"
+        },
+        {
+            "label": "$(remote-explorer-feedback)Offboard",
+            "task": "offboard",
+            "tooltip": "Change to offboard mode"
+        },
     ]
 }
