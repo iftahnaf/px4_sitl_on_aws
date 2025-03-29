@@ -5,3 +5,6 @@
 	path = PX4-Autopilot
 	url = git@github.com:PX4/PX4-Autopilot.git
 
+[submodule "src/px4-offboard"]
+	path = src/px4-offboard
+	url = git@github.com:Jaeyoung-Lim/px4-offboard.git
