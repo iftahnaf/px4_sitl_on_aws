@@ -28,7 +28,7 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
         pid = recorder.process_details['pid']
         os.kill(pid, signal.SIGTERM)
 
-        print(f"killed recorded on process {pid}")
+        logging.info(f"killed recorded on process {pid}")
         time.sleep(1.0)
 
         message_counts = defaultdict(int)
@@ -38,9 +38,14 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
             for conn, timestamp, raw in reader.messages():
                 message_counts[conn.topic] += 1
 
-        print(f"Topics in bag: {bag_name}\n")
+        logging.info(f"Topics in bag: {bag_name}\n")
         for topic, count in sorted(message_counts.items(), key=lambda x: x[0]):
-            print(f"{topic}: {count} messages")
+            logging.info(f"{topic}: {count} messages")
+            if count == 0:
+                logging.error(f"Topic {topic} has no messages")
+                return 1
+        logging.info(f"Bag {bag_name} has been analyzed")
+        return 0
 
 def generate_launch_description():
 
