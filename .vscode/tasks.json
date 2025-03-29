@@ -38,7 +38,7 @@
         {
             "label": "run-simulation",
             "type": "shell",
-            "command": "source /workspaces/px4_sitl_on_aws/install/local_setup.bash && ros2 launch px4-external-module ci.launch.py",
+            "command": "source /workspaces/px4_sitl_on_aws/install/local_setup.bash && ros2 launch px4_ci_aws ci.launch.py",
             "problemMatcher": [],
             "options": {
                 "shell": {
