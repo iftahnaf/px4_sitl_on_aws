@@ -10,6 +10,7 @@ from launch.event_handlers import OnProcessExit
 from launch.events import Shutdown
 import launch.logging
 import logging
+import time
 
 launch.logging.launch_config.level = logging.INFO
 
@@ -39,8 +40,8 @@ def generate_launch_description():
 
     node_arm_and_offboard = Node(
             package='px4_ci_aws',
-            executable='px4_arm_and_offboard.py',
-            name='arm_and_offboard',
+            executable='px4_state_machine.py',
+            name='px4_state_machine',
         )
     
     node_offboard = Node(
@@ -49,6 +50,19 @@ def generate_launch_description():
             executable='offboard_control',
             name='control',
             parameters= [{'radius': 10.0},{'altitude': 5.0},{'omega': 0.5}]
+        )
+    
+    current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+    recorder = ExecuteProcess(
+            cmd=[
+                "ros2",
+                "bag",
+                "record",
+                "-a",
+                "-o",
+                f"/bags/{current_time}",
+
+            ],
         )
     
     sys_shut_down = RegisterEventHandler(
@@ -65,6 +79,7 @@ def generate_launch_description():
         node_arm_and_offboard,
         node_offboard,
         node_dds_agent,
+        recorder,
         sys_shut_down,
         px4_proc,
     ]

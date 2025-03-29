@@ -30,7 +30,7 @@ install(DIRECTORY
 
 # install Python node as executable
 install(PROGRAMS
-  src/px4_arm_and_offboard.py
+  src/px4_state_machine.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

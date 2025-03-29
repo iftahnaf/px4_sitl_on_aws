@@ -54,12 +54,12 @@ class ArmOffboardNode(Node):
         )
 
         # Timer to check status
-        self.timer = self.create_timer(0.5, self.control_loop)
+        self.timer = self.create_timer(0.5, self.state_machine)
 
     def status_callback(self, msg: VehicleStatus):
         self.status = msg
 
-    def control_loop(self):
+    def state_machine(self):
         if self.offboard_state == OffboardState.INIT:
             self.get_logger().info("Waiting for vehicle_status...", throttle_duration_sec=5.0)
             if self.status is not None:
