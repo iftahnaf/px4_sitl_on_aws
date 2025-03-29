@@ -24,7 +24,11 @@ from collections import defaultdict
 
 launch.logging.launch_config.level = logging.INFO
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y%m%d_%H%M%S'
+)
 
 def update_nav_dll_act(filepath: str, new_value: int = 0):
     """
@@ -67,7 +71,12 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
 
         logging.info(f"Topics in bag: {bag_name}\n")
         for topic, count in sorted(message_counts.items(), key=lambda x: x[0]):
-            logging.info(f"{topic}: {count} messages")
+            if count > 10:
+                logging.info(f"{topic}: {count} messages")
+            elif count <= 10:
+                logging.warning(f"{topic}: only {count} messages")
+            else:
+                logging.error(f"{topic}: no messages")
 
         logging.info(f"Bag {bag_name} has been analyzed")
 
