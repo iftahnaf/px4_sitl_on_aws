@@ -29,6 +29,7 @@ class ArmOffboardNode(Node):
         self.status = None
         self.prefix = "/fmu"
         self.offboard_state = OffboardState.INIT
+        self.rtl_triggered = False
 
         qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.BEST_EFFORT,
@@ -81,14 +82,16 @@ class ArmOffboardNode(Node):
             self.get_logger().info("Vehicle is armed and in OFFBOARD mode.", throttle_duration_sec=5.0)
             current_time_s = self.get_clock().now().seconds_nanoseconds()[0] + self.get_clock().now().seconds_nanoseconds()[1] / 1e9
             delta_time_s = current_time_s - self.offboard_init_time_s
-            if delta_time_s > 30.0:
+            if delta_time_s > 15.0:
                 self.offboard_state = OffboardState.RTL
-                self.get_logger().info("RTL command will be sent in 10 seconds.", throttle_duration_sec=5.0)
+                self.get_logger().info("RTL command will be sent.", throttle_duration_sec=5.0)
         
         elif self.offboard_state == OffboardState.RTL:
-            self.get_logger().info("Sending RTL command...", once=True)
-            self.set_rtl()
-            if self.status.nav_state == VehicleStatus.NAVIGATION_STATE_AUTO_LAND:
+            if not self.rtl_triggered:
+                self.set_rtl()
+                self.get_logger().info("Sending RTL command...", once=True)
+                self.rtl_triggered = True
+            if self.status.arming_state == VehicleStatus.ARMING_STATE_DISARMED:
                 self.offboard_state = OffboardState.DONE
         
         elif self.offboard_state == OffboardState.DONE:

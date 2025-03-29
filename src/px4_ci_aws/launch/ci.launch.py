@@ -1,21 +1,17 @@
 from launch import LaunchDescription
 from launch.actions import (
-    ExecuteProcess
+    ExecuteProcess,
+    EmitEvent,
+    LogInfo,
+    RegisterEventHandler
 )
 from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
+from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
 import launch.logging
 import logging
-import os
 
 launch.logging.launch_config.level = logging.INFO
-
-parameters = os.path.join(
-        get_package_share_directory('px4-external-module'),
-        'config',
-        'params.yaml'
-    )
-
 
 def generate_launch_description():
     px4_launch_command = (
@@ -55,10 +51,21 @@ def generate_launch_description():
             parameters= [{'radius': 10.0},{'altitude': 5.0},{'omega': 0.5}]
         )
     
+    sys_shut_down = RegisterEventHandler(
+        OnProcessExit(
+            target_action=node_arm_and_offboard,
+            on_exit=[
+                LogInfo(msg=("The Scenario has ended!")),
+                EmitEvent(event=Shutdown(reason="Finished")),
+            ],
+        )
+    )
+    
     elements_to_launch = [
         node_arm_and_offboard,
         node_offboard,
         node_dds_agent,
+        sys_shut_down,
         px4_proc,
     ]
 
