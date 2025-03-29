@@ -17,6 +17,10 @@ import os
 import signal
 from launch import LaunchContext
 
+from rosbags.highlevel import AnyReader
+from pathlib import Path
+from collections import defaultdict
+
 launch.logging.launch_config.level = logging.INFO
 
 def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: str, recorder: ExecuteProcess):
@@ -27,7 +31,16 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
         print(f"killed recorded on process {pid}")
         time.sleep(1.0)
 
-        print("post processing...")
+        message_counts = defaultdict(int)
+
+        with AnyReader([Path(bag_name)]) as reader:
+            reader.open()
+            for conn, timestamp, raw in reader.messages():
+                message_counts[conn.topic] += 1
+
+        print(f"Topics in bag: {bag_name}\n")
+        for topic, count in sorted(message_counts.items(), key=lambda x: x[0]):
+            print(f"{topic}: {count} messages")
 
 def generate_launch_description():
 
