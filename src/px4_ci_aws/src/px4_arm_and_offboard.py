@@ -6,11 +6,20 @@ from rclpy.clock import Clock
 from px4_msgs.msg import VehicleStatus, VehicleCommand, OffboardControlMode
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy, QoSHistoryPolicy
 from enum import Enum
+import sys
 
 
 class XRCE_TOPICS(Enum):
     VEHICLE_COMMAND = "in/vehicle_command"
     OFFBOARD_CONTROL_MODE = "in/offboard_control_mode"
+
+class OffboardState(Enum):
+    INIT = 0
+    ARMING = 1
+    ARMED = 2
+    OFFBOARD = 3
+    RTL = 4
+    DONE = 5
 
 
 class ArmOffboardNode(Node):
@@ -19,6 +28,7 @@ class ArmOffboardNode(Node):
 
         self.status = None
         self.prefix = "/fmu"
+        self.offboard_state = OffboardState.INIT
 
         qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.BEST_EFFORT,
@@ -49,20 +59,43 @@ class ArmOffboardNode(Node):
         self.status = msg
 
     def control_loop(self):
-        if self.status is None:
+        if self.offboard_state == OffboardState.INIT:
             self.get_logger().info("Waiting for vehicle_status...", throttle_duration_sec=5.0)
-            return
+            if self.status is not None:
+                self.offboard_state = OffboardState.ARMING
 
-        if self.status.arming_state != VehicleStatus.ARMING_STATE_ARMED:
+        if self.offboard_state == OffboardState.ARMING:
             self.get_logger().info("Sending ARM command...", throttle_duration_sec=5.0)
             self.arm()
+            if self.status.arming_state == VehicleStatus.ARMING_STATE_ARMED:
+                self.offboard_state = OffboardState.ARMED
 
-        elif self.status.nav_state != VehicleStatus.NAVIGATION_STATE_OFFBOARD:
+        elif self.offboard_state == OffboardState.ARMED:
             self.get_logger().info("Sending OFFBOARD command...", throttle_duration_sec=5.0)
             self.set_offboard()
+            if self.status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
+                self.offboard_state = OffboardState.OFFBOARD
+                self.offboard_init_time_s = self.get_clock().now().seconds_nanoseconds()[0] + self.get_clock().now().seconds_nanoseconds()[1] / 1e9
 
-        else:
-            self.get_logger().info("Vehicle is armed and in OFFBOARD mode.", once=True)
+        elif self.offboard_state == OffboardState.OFFBOARD:
+            self.get_logger().info("Vehicle is armed and in OFFBOARD mode.", throttle_duration_sec=5.0)
+            current_time_s = self.get_clock().now().seconds_nanoseconds()[0] + self.get_clock().now().seconds_nanoseconds()[1] / 1e9
+            delta_time_s = current_time_s - self.offboard_init_time_s
+            if delta_time_s > 30.0:
+                self.offboard_state = OffboardState.RTL
+                self.get_logger().info("RTL command will be sent in 10 seconds.", throttle_duration_sec=5.0)
+        
+        elif self.offboard_state == OffboardState.RTL:
+            self.get_logger().info("Sending RTL command...", once=True)
+            self.set_rtl()
+            if self.status.nav_state == VehicleStatus.NAVIGATION_STATE_AUTO_LAND:
+                self.offboard_state = OffboardState.DONE
+        
+        elif self.offboard_state == OffboardState.DONE:
+            self.get_logger().info("Mission completed.", once=True)
+            self.timer.cancel()
+            sys.exit(0)
+
 
     def arm(self):
         msg = VehicleCommand()
@@ -99,6 +132,18 @@ class ArmOffboardNode(Node):
         ctrl.position = True
         ctrl.acceleration = False
         self.offboard_mode_pub.publish(ctrl)
+
+    def set_rtl(self):
+        msg = VehicleCommand()
+        msg.command = VehicleCommand.VEHICLE_CMD_NAV_RETURN_TO_LAUNCH
+        msg.timestamp = int(Clock().now().nanoseconds / 1000)
+        msg.target_system = 1
+        msg.target_component = 1
+        msg.source_system = 101
+        msg.source_component = 1
+        msg.from_external = True
+        self.vehicle_command_pub.publish(msg)
+        self.get_logger().info("RTL command sent.")
 
 
 def main(args=None):
