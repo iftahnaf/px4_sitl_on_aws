@@ -3,18 +3,34 @@ from launch.actions import (
     ExecuteProcess,
     EmitEvent,
     LogInfo,
-    RegisterEventHandler
+    RegisterEventHandler,
+    OpaqueFunction
 )
 from launch_ros.actions import Node
-from launch.event_handlers import OnProcessExit
+from launch.event_handlers import OnProcessExit, OnShutdown
 from launch.events import Shutdown
+from launch.substitutions import LaunchConfiguration
 import launch.logging
 import logging
 import time
+import os
+import signal
+from launch import LaunchContext
 
 launch.logging.launch_config.level = logging.INFO
 
+def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: str, recorder: ExecuteProcess):
+        time.sleep(1.0)
+        pid = recorder.process_details['pid']
+        os.kill(pid, signal.SIGTERM)
+
+        print(f"killed recorded on process {pid}")
+        time.sleep(1.0)
+
+        print("post processing...")
+
 def generate_launch_description():
+
     px4_launch_command = (
         "cd /workspaces/px4_sitl_on_aws/PX4-Autopilot && sleep 2 &&"
         + " PX4_SYS_AUTOSTART=4001"
@@ -52,7 +68,7 @@ def generate_launch_description():
             parameters= [{'radius': 10.0},{'altitude': 5.0},{'omega': 0.5}]
         )
     
-    current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+    bag_name = f'/bags/{time.strftime("%Y-%m-%d_%H:%M:%S", time.gmtime())}'
     recorder = ExecuteProcess(
             cmd=[
                 "ros2",
@@ -60,7 +76,7 @@ def generate_launch_description():
                 "record",
                 "-a",
                 "-o",
-                f"/bags/{current_time}",
+                f"{bag_name}",
 
             ],
         )
@@ -74,6 +90,16 @@ def generate_launch_description():
             ],
         )
     )
+
+    analysis_configuration = LaunchConfiguration('analysis')
+    analyze = RegisterEventHandler(
+        OnShutdown(
+            on_shutdown=[
+                LogInfo(msg='Analyzing the bag'),
+                OpaqueFunction(function=post_process, args=[analysis_configuration, bag_name, recorder])
+            ]
+        )
+    )
     
     elements_to_launch = [
         node_arm_and_offboard,
@@ -81,6 +107,7 @@ def generate_launch_description():
         node_dds_agent,
         recorder,
         sys_shut_down,
+        analyze,
         px4_proc,
     ]
 
