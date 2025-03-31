@@ -1,0 +1,57 @@
+name: Build
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR label matches
+        id: check
+        run: |
+          labels=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
+          if echo "$labels" | grep -E "build"; then
+            echo "should_build=true" >> $GITHUB_ENV
+          else
+            echo "should_build=false" >> $GITHUB_ENV
+          fi
+
+      - name: Checkout code
+        if: env.should_build == 'true'
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.WORKSPACE_ACCESS_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        if: env.should_build == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.WORKSPACE_ACCESS_TOKEN }}
+
+      - name: Cache Docker layers
+        if: env.should_build == 'true'
+        uses: actions/cache@v4.2.3
+        with:
+            path: /tmp/.docker-cache
+            key: docker-cache-${{ runner.os }}-${{ github.ref_name }}
+            restore-keys: |
+              docker-cache-${{ runner.os }}-
+  
+      - name: Build and push simulation image
+        if: env.should_build == 'true'
+        run: |
+              ./scripts/build_sim.sh
+  
+      - name: No Relevant Label
+        if: env.should_build == 'false'
+        run: echo "No relevant label found, skipping build."
+  
+
