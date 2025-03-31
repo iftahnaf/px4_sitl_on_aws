@@ -26,7 +26,7 @@ jobs:
           ec2-instance-type: c6i.2xlarge
           subnet-id: subnet-0dea4abf480e9a1bb
           security-group-id: sg-052634c0405d6a10b
-          iam-role-name: iftahnaf-ec2
+          iam-role-name: px4_sitl_on_aws
           
   do-the-job:
     name: Run Private GHCR Image
