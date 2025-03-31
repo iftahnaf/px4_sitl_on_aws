@@ -34,10 +34,5 @@ jobs:
   
       - name: Build and push simulation image
         run: |
-              ./scripts/build_sim.sh
-  
-      - name: No Relevant Label
-        if: env.should_build == 'false'
-        run: echo "No relevant label found, skipping build."
-  
+              ./scripts/build_sim.sh 
 
