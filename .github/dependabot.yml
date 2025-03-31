@@ -1,0 +1,40 @@
+version: 2
+updates:
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: "daily"
+  open-pull-requests-limit: 5
+  assignees:
+    - iftahnaf
+  labels:
+    - dependencies
+    - github-actions
+  commit-message:
+    prefix: "ci(github-actions):"
+
+- package-ecosystem: "gitsubmodule"
+  directory: "/"
+  schedule:
+    interval: "daily"
+  open-pull-requests-limit: 5
+  assignees:
+    - iftahnaf
+  labels:
+    - dependencies
+    - gitsubmodule
+  commit-message:
+    prefix: "ci(gitsubmodule):"
+
+- package-ecosystem: "docker"
+  directory: "/"
+  schedule:
+    interval: "daily"
+  open-pull-requests-limit: 5
+  assignees:
+    - iftahnaf
+  labels:
+    - dependencies
+    - docker
+  commit-message:
+    prefix: "ci(docker):"

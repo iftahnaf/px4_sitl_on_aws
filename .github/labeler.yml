@@ -1,0 +1,32 @@
+# Add 'Documentation' label to any changes within 'docs' folder or any subfolders
+documentation:
+    - changed-files:
+          - any-glob-to-any-file: ["docs/**", "**/*.md"]
+    - head-branch: ["^docs", "docs"]
+
+
+# Add 'test' label to any change to test files within the test dir
+tests:
+    - changed-files:
+          - any-glob-to-any-file: "tests/**/*"
+
+# Add example label to any change to example files within the example dir
+examples:
+    - changed-files:
+          - any-glob-to-any-file: "examples/**/*"
+
+# Add .vscode label to any change to vscode files within the .vscode dir
+vscode:
+    - changed-files:
+          - any-glob-to-any-file: ".vscode/**/*"
+
+# Add devcontainer label to any change to devcontainer files within the .devcontainer dir
+devcontainer:
+    - changed-files:
+          - any-glob-to-any-file: ".devcontainer/**/*"
+
+# Add ci label to any change to ci files within the .github dir
+ci:
+    - changed-files:
+          - any-glob-to-any-file: ".github/**/*"
+    - head-branch: ["^ci", "ci"]

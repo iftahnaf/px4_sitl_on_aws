@@ -1,0 +1,25 @@
+################# Build Image #################
+FROM ghcr.io/iftahnaf/dev:latest
+
+ENV WORKSPACE_DIR=/workspaces/px4_sitl_on_aws
+
+# Copy PX4-AutoPilot and install dependencies
+RUN git clone https://github.com/PX4/PX4-Autopilot.git ${WORKSPACE_DIR}/PX4-Autopilot
+RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && . /venv/bin/activate && git submodule update --init --recursive
+RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && . /venv/bin/activate && bash ./Tools/setup/ubuntu.sh
+RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
+    rm -rf ./build &&  . /venv/bin/activate && \
+    make px4_sitl
+
+# Copy ROS2 packages and build
+COPY --chown=ros:ros ./src ${WORKSPACE_DIR}/src
+RUN cd ${WORKSPACE_DIR} && \
+    export MAKEFLAGS="-j 16" && \
+    colcon build --parallel-workers=2 --executor sequential --packages-ignore px4  --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+
+# Copy entrypoint
+COPY --chown=ros:ros ./scripts/simulation.sh simulation.sh
+RUN chmod +x simulation.sh
+
+# Set entrypoint as simulation.sh
+ENTRYPOINT ["bash", "-c", "./simulation.sh"]
