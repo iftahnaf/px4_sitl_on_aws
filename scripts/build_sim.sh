@@ -1,15 +1,12 @@
 #!/bin/bash
+set -e
 
-# Get current timestamp
+registry=$1
 timestamp=$(date +"%Y%m%d%H%M")
+image="$registry/simulation:$timestamp"
 
-# Define image name
-image="ghcr.io/iftahnaf/simulation:$timestamp"
-
-# Build image with timestamp
 docker build -t "$image" -f ./dockers/Dockerfile.simulation .
-
-# Push both timestamped and latest tags
 docker push "$image"
-docker tag "$image" ghcr.io/iftahnaf/simulation:latest
-docker push ghcr.io/iftahnaf/simulation:latest
+
+docker tag "$image" "$registry/simulation:latest"
+docker push "$registry/simulation:latest"
