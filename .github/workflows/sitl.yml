@@ -21,7 +21,7 @@ jobs:
         uses: machulav/ec2-github-runner@v2
         with:
           mode: start
-          github-token: ${{ secrets. REPO_TOKEN }}
+          github-token: ${{ secrets.REPO_TOKEN }}
           ec2-image-id: ami-0221cb43bdc5b320b
           ec2-instance-type: c6i.2xlarge
           subnet-id: subnet-0dea4abf480e9a1bb
@@ -42,7 +42,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           
       - name: Login to Amazon ECR
-          uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Pull and Run the Docker Image
         run: |
@@ -77,6 +77,6 @@ jobs:
         uses: machulav/ec2-github-runner@v2
         with:
           mode: stop
-          github-token: ${{ secrets. REPO_TOKEN }}
+          github-token: ${{ secrets.REPO_TOKEN }}
           label: ${{ needs.start-runner.outputs.label }}
           ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
