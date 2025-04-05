@@ -38,4 +38,4 @@ jobs:
 
       - name: Build and push simulation image
         run: |
-          ./scripts/build_sim.sh ${{ steps.login-ecr.outputs.registry }}
+          ./scripts/build_sim.sh
