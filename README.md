@@ -75,8 +75,7 @@ This repository provides an infrastructure example for:
 
 ## Documentation
 
-1. [Install](./docs/install.md)
-2. [AWS Setup](./docs/aws_setup.md)
+See [Wiki]()
 
 
 

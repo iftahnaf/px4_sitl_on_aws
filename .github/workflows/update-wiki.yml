@@ -1,0 +1,54 @@
+name: Sync README to Wiki
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+      types:
+        - labeled  # Trigger only when a label is added
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR label matches
+        id: check
+        run: |
+          labels=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
+          if echo "$labels" | grep -E "(documentation)"; then
+            echo "should_build=true" >> $GITHUB_ENV
+          else
+            echo "should_build=false" >> $GITHUB_ENV
+          fi
+
+      - name: Checkout repository
+        if: env.should_build == 'true'
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.REPO_TOKEN }}
+
+      - name: Checkout Wiki
+        if: env.should_build == 'true'
+        run: |
+          git clone https://${{ secrets.REPO_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
+
+      - name: Copy Markdown to Wiki
+        if: env.should_build == 'true'
+        run: |
+          cp README.md wiki/Home.md  # Copy README to Wiki as Home page
+          cp docs/*.md wiki/  # Copy all docs/*.md files (if you have them)
+
+      - name: Commit and Push Changes
+        if: env.should_build == 'true'
+        run: |
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "docs: update wiki" || echo "No changes to commit"
+          git push https://${{ secrets.REPO_TOKEN }}@github.com/${{ github.repository }}.wiki.git
+
+      - name: No Relevant Label
+        if: env.should_build == 'false'
+        run: echo "No relevant label found, skipping build."
