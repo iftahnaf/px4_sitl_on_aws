@@ -45,6 +45,7 @@ jobs:
         if: env.source_label_present == 'true'
         uses: ros-tooling/action-ros-ci@v0.4
         with:
-          import-token: ${{ secrets.REPO_TOKEN }}
-          target-ros2-distro: rolling
-          skip-tests: true
+            package-name: px4_ci_aws
+            import-token: ${{ secrets.REPO_TOKEN }}
+            target-ros2-distro: rolling
+            skip-tests: true
