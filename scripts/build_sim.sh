@@ -7,13 +7,13 @@ timestamp=$(date +"%Y%m%d%H%M")
 
 image="$registry/$repo:$timestamp"
 
-echo "🔧 Building image: $image"
+echo "Building image: $image"
 
 docker build -t "$image" -f ./dockers/Dockerfile.simulation .
 
-echo "📦 Pushing image: $image"
+echo "Pushing image: $image"
 docker push "$image"
 
-echo "🔁 Tagging and pushing 'latest'"
+echo "Tagging and pushing 'latest'"
 docker tag "$image" "$registry/$repo:latest"
 docker push "$registry/$repo:latest"

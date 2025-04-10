@@ -1,0 +1,51 @@
+name: rolling
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  label:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - uses: actions/labeler@v5
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+  build:
+    runs-on: ubuntu-latest
+    needs: label
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if source label is present
+        id: check
+        run: |
+          labels=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
+          if echo "$labels" | grep -q "source"; then
+            echo "source_label_present=true" >> $GITHUB_ENV
+          else
+            echo "source_label_present=false" >> $GITHUB_ENV
+          fi
+
+      - name: Set up ROS
+        if: env.source_label_present == 'true'
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: rolling
+          use-ros2-testing: false
+
+      - name: Build ROS 2 package
+        if: env.source_label_present == 'true'
+        uses: ros-tooling/action-ros-ci@v0.4
+        with:
+            package-name: px4_ci_aws
+            import-token: ${{ secrets.REPO_TOKEN }}
+            target-ros2-distro: rolling
+            skip-tests: true
