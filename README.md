@@ -8,7 +8,7 @@ Once the simulation ends, a simple analysis script runs to count the number of m
 
 
 ```mermaid
-flowchart LR
+flowchart TB
     A[Code Change in ROS 2 Node] --> B[GitHub Actions Triggered]
     B --> C[Build New Docker Image]
     C --> D[Push Image to AWS ECR]
