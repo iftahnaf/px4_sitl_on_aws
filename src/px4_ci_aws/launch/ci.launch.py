@@ -87,7 +87,7 @@ def generate_launch_description():
     px4_launch_command = (
         "cd /workspaces/px4_sitl_on_aws/PX4-Autopilot && sleep 2 &&"
         + " HEADLESS=1 PX4_SYS_AUTOSTART=4001"
-        + " PX4_SIM_MODEL=gz_x500 make px4_sitl gz_x500"
+        + " PX4_SIM_MODEL=gz_x500 ./build/px4_sitl_default/bin/px4"
     )
 
     px4_proc = ExecuteProcess(
@@ -99,6 +99,18 @@ def generate_launch_description():
         output="screen",
         emulate_tty=True,
         name="px4",
+    )
+
+    gz_sim_command = [
+        "python3",
+        "/workspaces/px4_workspace/PX4-Autopilot/Tools/simulation/gz/simulation-gazebo",
+    ]
+
+    gz_sim = ExecuteProcess(
+        cmd=gz_sim_command,
+        name="gz_sim",
+        output="screen",
+        emulate_tty=True,
     )
 
     node_dds_agent = ExecuteProcess(
@@ -164,6 +176,7 @@ def generate_launch_description():
     
     elements_to_launch = [
         px4_proc,
+        gz_sim,
         node_arm_and_offboard,
         node_offboard,
         node_dds_agent,
