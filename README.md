@@ -1,3 +1,5 @@
+![Jazzy](https://github.com/iftahnaf/px4_sitl_on_aws/actions/workflows/jazzy.yml/badge.svg)
+![Rolling](https://github.com/iftahnaf/px4_sitl_on_aws/actions/workflows/rolling.yml/badge.svg)
 # PX4 SITL on AWS — Automated Simulation & Testing Pipeline
 
 This repository demonstrates an automated workflow for running PX4 SITL (Software-In-The-Loop) simulations on AWS infrastructure — fully managed by GitHub Actions.
@@ -9,7 +11,7 @@ Once the simulation ends, a simple analysis script runs to count the number of m
 
 ```mermaid
 flowchart TB
-    A[Code Change in ROS 2 Node] --> B[GitHub Actions Triggered]
+    A[Code Change in the ROS 2 Workspace] --> B[GitHub Actions Triggered]
     B --> C[Build New Docker Image]
     C --> D[Push Image to AWS ECR]
     D --> E[Launch EC2 Instance]
