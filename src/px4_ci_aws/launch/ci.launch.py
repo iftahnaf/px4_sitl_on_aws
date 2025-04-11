@@ -30,30 +30,6 @@ logging.basicConfig(
     datefmt='%Y%m%d_%H%M%S'
 )
 
-def update_nav_dll_act(filepath: str, new_value: int = 0):
-    """
-    Update the NAV_DLL_ACT parameter value in a PX4 shell configuration script.
-
-    Args:
-        filepath (str): Path to the shell script file.
-        new_value (int): The new value to set (default: 0).
-    """
-    with open(filepath, 'r') as f:
-        lines = f.readlines()
-
-    updated_lines = []
-    for line in lines:
-        if line.strip().startswith("param set-default NAV_DLL_ACT"):
-            updated_line = f"param set-default NAV_DLL_ACT {new_value}\n"
-            updated_lines.append(updated_line)
-        else:
-            updated_lines.append(line)
-
-    with open(filepath, 'w') as f:
-        f.writelines(updated_lines)
-
-    logging.info(f"Updated NAV_DLL_ACT to {new_value} in {filepath}")
-
 def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: str, recorder: ExecuteProcess):
         time.sleep(1.0)
         pid = recorder.process_details['pid']
@@ -79,8 +55,6 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
                 logging.error(f"{topic}: no messages")
 
         logging.info(f"Bag {bag_name} has been analyzed")
-
-update_nav_dll_act("/workspaces/px4_sitl_on_aws/PX4-Autopilot/ROMFS/px4fmu_common/init.d-posix/airframes/4001_gz_x500", 0)
 
 def generate_launch_description():
 
