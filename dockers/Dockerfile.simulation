@@ -1,5 +1,5 @@
 ################# Build Image #################
-FROM ghcr.io/iftahnaf/dev:latest
+FROM ghcr.io/iftahnaf/dev:latest as build
 
 ENV WORKSPACE_DIR=/workspaces/px4_sitl_on_aws
 
@@ -7,6 +7,8 @@ ENV WORKSPACE_DIR=/workspaces/px4_sitl_on_aws
 RUN git clone https://github.com/PX4/PX4-Autopilot.git ${WORKSPACE_DIR}/PX4-Autopilot
 RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && . /venv/bin/activate && git submodule update --init --recursive
 RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && . /venv/bin/activate && bash ./Tools/setup/ubuntu.sh
+COPY ./scripts/update_nav_dll_act.py ./update_nav_dll_act.py
+RUN python3 ./update_nav_dll_act.py
 RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
     rm -rf ./build &&  . /venv/bin/activate && \
     make px4_sitl
@@ -16,6 +18,22 @@ COPY --chown=ros:ros ./src ${WORKSPACE_DIR}/src
 RUN cd ${WORKSPACE_DIR} && \
     export MAKEFLAGS="-j 16" && \
     colcon build --parallel-workers=2 --executor sequential --packages-ignore px4  --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+
+################# PRODUCTION IMAGE #################
+FROM ghcr.io/iftahnaf/dev:latest
+ENV WORKSPACE_DIR=/workspaces/px4_sitl_on_aws
+# Copy PX4-AutoPilot and install dependencies
+COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/build ${WORKSPACE_DIR}/PX4-Autopilot/build
+COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/Tools/gz ${WORKSPACE_DIR}/PX4-Autopilot/Tools/gz
+COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/Tools/setup/ubuntu.sh ${WORKSPACE_DIR}/PX4-Autopilot/Tools/setup/ubuntu.sh
+
+# run ubuntu.sh to install dependencies
+RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
+    . /venv/bin/activate && \
+    bash ./Tools/setup/ubuntu.sh
+
+# Copy ROS2 packages and build
+COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/install ${WORKSPACE_DIR}/install
 
 # Copy entrypoint
 COPY --chown=ros:ros ./scripts/simulation.sh simulation.sh
