@@ -24,7 +24,7 @@ FROM ghcr.io/iftahnaf/dev:latest
 ENV WORKSPACE_DIR=/workspaces/px4_sitl_on_aws
 # Copy PX4-AutoPilot and install dependencies
 COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/build ${WORKSPACE_DIR}/PX4-Autopilot/build
-COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/Tools/gz ${WORKSPACE_DIR}/PX4-Autopilot/Tools/gz
+COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/Tools/simulation/gz ${WORKSPACE_DIR}/PX4-Autopilot/Tools/simulation/gz
 COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/Tools/setup/ubuntu.sh ${WORKSPACE_DIR}/PX4-Autopilot/Tools/setup/ubuntu.sh
 
 # run ubuntu.sh to install dependencies
