@@ -14,7 +14,15 @@ RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
     make px4_sitl
 
 # Copy ROS2 packages and build
-COPY --chown=ros:ros ./src ${WORKSPACE_DIR}/src
+RUN mkdir -p /msgs_ws/src
+COPY --chown=ros:ros ./src/px4_msgs ${WORKSPACE_DIR}/msgs_ws/src
+RUN cd /msgs_ws && \
+    export MAKEFLAGS="-j 16" && \
+    colcon build
+
+COPY --chown=ros:ros ./src/px4-offboard ${WORKSPACE_DIR}/src/px4-offboard
+COPY --chown=ros:ros ./src/px4_ci_aws ${WORKSPACE_DIR}/src/px4_ci_aws
+
 RUN cd ${WORKSPACE_DIR} && \
     export MAKEFLAGS="-j 16" && \
     colcon build --parallel-workers=2 --executor sequential --packages-ignore px4  --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
@@ -25,7 +33,7 @@ ENV WORKSPACE_DIR=/workspaces/px4_sitl_on_aws
 # Copy PX4-AutoPilot and install dependencies
 COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/build ${WORKSPACE_DIR}/PX4-Autopilot/build
 COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/Tools/simulation/gz ${WORKSPACE_DIR}/PX4-Autopilot/Tools/simulation/gz
-COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/Tools/setup/ubuntu.sh ${WORKSPACE_DIR}/PX4-Autopilot/Tools/setup/ubuntu.sh
+COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/PX4-Autopilot/Tools/setup ${WORKSPACE_DIR}/PX4-Autopilot/Tools/setup
 
 # run ubuntu.sh to install dependencies
 RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
@@ -34,6 +42,7 @@ RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
 
 # Copy ROS2 packages and build
 COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/install ${WORKSPACE_DIR}/install
+COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/msgs_ws/install ${WORKSPACE_DIR}/install
 
 # Copy entrypoint
 COPY --chown=ros:ros ./scripts/simulation.sh simulation.sh

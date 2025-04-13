@@ -9,11 +9,14 @@ image="$registry/$repo:$timestamp"
 
 echo "Building image: $image"
 
-docker build -t "$image" -f ./dockers/Dockerfile.simulation .
+docker buildx create --use
 
-echo "Pushing image: $image"
-docker push "$image"
+docker buildx build \
+  --cache-from=type=local,src=/tmp/.buildx-cache \
+  --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
+  --push \
+  -t "$image" \
+  -t "$registry/$repo:latest" \
+  -f ./dockers/Dockerfile.simulation .
 
-echo "Tagging and pushing 'latest'"
-docker tag "$image" "$registry/$repo:latest"
-docker push "$registry/$repo:latest"
+echo "Image pushed successfully: $image"
