@@ -25,6 +25,7 @@ COPY --chown=ros:ros ./src/px4_ci_aws ${WORKSPACE_DIR}/src/px4_ci_aws
 
 RUN cd ${WORKSPACE_DIR} && \
     export MAKEFLAGS="-j 16" && \
+    bash -c "source /ws_msgs/install/local_setup.bash && \" && \
     colcon build --parallel-workers=2 --executor sequential --packages-ignore px4  --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
 
 ################# PRODUCTION IMAGE #################
