@@ -15,7 +15,7 @@ RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
 
 # Copy ROS2 packages and build
 RUN mkdir -p /msgs_ws/src
-COPY --chown=ros:ros ./src/px4_msgs ${WORKSPACE_DIR}/msgs_ws/src
+COPY --chown=ros:ros ./src/px4_msgs /msgs_ws/src
 RUN cd /msgs_ws && \
     export MAKEFLAGS="-j 16" && \
     colcon build
@@ -42,7 +42,7 @@ RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
 
 # Copy ROS2 packages and build
 COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/install ${WORKSPACE_DIR}/install
-COPY --chown=ros:ros --from=build ${WORKSPACE_DIR}/msgs_ws/install ${WORKSPACE_DIR}/install
+COPY --chown=ros:ros --from=build /msgs_ws/install ${WORKSPACE_DIR}/install
 
 # Copy entrypoint
 COPY --chown=ros:ros ./scripts/simulation.sh simulation.sh
