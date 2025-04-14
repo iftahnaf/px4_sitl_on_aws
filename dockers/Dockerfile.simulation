@@ -15,17 +15,17 @@ RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
 
 # Copy ROS2 packages and build
 RUN mkdir -p /msgs_ws/src
-COPY --chown=ros:ros ./src/px4_msgs /msgs_ws/src
+COPY --chown=ros:ros ./src/px4_msgs /msgs_ws/src/px4_msgs
 RUN cd /msgs_ws && \
-    export MAKEFLAGS="-j 16" && \
+    export MAKEFLAGS="-j16" && \
     colcon build
 
 COPY --chown=ros:ros ./src/px4-offboard ${WORKSPACE_DIR}/src/px4-offboard
 COPY --chown=ros:ros ./src/px4_ci_aws ${WORKSPACE_DIR}/src/px4_ci_aws
 
 RUN cd ${WORKSPACE_DIR} && \
-    export MAKEFLAGS="-j 16" && \
-    bash -c "source /msgs_ws/install/local_setup.bash" && \
+    export MAKEFLAGS="-j16" && \
+    . /msgs_ws/install/local_setup.sh && \
     colcon build --parallel-workers=2 --executor sequential --packages-ignore px4  --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
 
 ################# PRODUCTION IMAGE #################
