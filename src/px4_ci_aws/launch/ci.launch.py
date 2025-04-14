@@ -79,6 +79,7 @@ def generate_launch_description():
         "python3",
         "/workspaces/px4_sitl_on_aws/PX4-Autopilot/Tools/simulation/gz/simulation-gazebo",
         "--headless"
+        "--overwrite",
     ]
 
     gz_sim = ExecuteProcess(
