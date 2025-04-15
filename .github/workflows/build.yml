@@ -58,9 +58,12 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive --force
           cd PX4-Autopilot
+          git remote add upstream https://github.com/PX4/PX4-Autopilot.git
+          git fetch upstream
+          git fetch upstream --tags
             if ! git describe --tags --exact-match >/dev/null 2>&1; then
-              echo "No Git tag found. Adding v1.x-x-x"
-              git tag v1.x-x-x
+              echo "No Git tag found. Adding v1.16.0-beta1"
+              git tag v1.16.0-beta1
             fi
           cd ..
           ./scripts/build_sim.sh
