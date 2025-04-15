@@ -26,11 +26,13 @@ jobs:
       - name: Cleanup Docker buildx cache
         run: rm -rf /tmp/.buildx-cache || true
 
-      - name: Checkout code
+      - name: Checkout code without submodules
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-          token: ${{ secrets.REPO_TOKEN }}
+          submodules: false
+      
+      - name: Init only required submodules
+        run: git submodule update --init ./src/px4_msgs ./src/px4-offboard
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
