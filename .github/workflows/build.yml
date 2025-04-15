@@ -62,4 +62,5 @@ jobs:
               echo "No Git tag found. Adding v1.x-x-x"
               git tag v1.x-x-x
             fi
+          cd ..
           ./scripts/build_sim.sh
