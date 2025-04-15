@@ -4,8 +4,9 @@ FROM ghcr.io/iftahnaf/dev:latest as base
 ENV WORKSPACE_DIR=/workspaces/px4_sitl_on_aws
 
 # Copy PX4-AutoPilot and install dependencies
-COPY ./.git ${WORKSPACE_DIR}/.git
-COPY ./PX4-Autopilot ${WORKSPACE_DIR}/PX4-Autopilot
+RUN git clone https://github.com/PX4/PX4-Autopilot.git ${WORKSPACE_DIR}/PX4-Autopilot
+RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && . /venv/bin/activate && git submodule update --init --recursive
+
 COPY ./scripts/update_nav_dll_act.py ./update_nav_dll_act.py
 COPY --chown=ros:ros ./scripts/simulation.sh simulation.sh
 
