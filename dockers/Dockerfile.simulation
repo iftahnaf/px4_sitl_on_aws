@@ -9,7 +9,7 @@ COPY ./scripts/update_nav_dll_act.py ./update_nav_dll_act.py
 COPY --chown=ros:ros ./scripts/simulation.sh simulation.sh
 
 # Install PX4 SITL dependencies
-RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && . /venv/bin/activate && bash ./Tools/setup/ubuntu.sh
+RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && . /venv/bin/activate && bash ./Tools/setup/ubuntu.sh --no-nuttx
 
 ################# BUILD IMAGE #################
 FROM base as build
@@ -18,6 +18,9 @@ ENV WORKSPACE_DIR=/workspaces/px4_sitl_on_aws
 # Build PX4 SITL
 RUN python3 ./update_nav_dll_act.py
 RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
+    git remote add upstream https://github.com/PX4/PX4-Autopilot.git && \
+    git fetch upstream && \
+    git fetch upstream --tags && \
     rm -rf ./build &&  . /venv/bin/activate && \
     make px4_sitl
 
