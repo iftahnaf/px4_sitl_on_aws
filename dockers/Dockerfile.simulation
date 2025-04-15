@@ -18,11 +18,8 @@ ENV WORKSPACE_DIR=/workspaces/px4_sitl_on_aws
 # Build PX4 SITL
 RUN python3 ./update_nav_dll_act.py
 RUN cd ${WORKSPACE_DIR}/PX4-Autopilot && \
-    git remote add upstream https://github.com/PX4/PX4-Autopilot.git && \
-    git fetch upstream && \
-    git fetch upstream --tags && \
     rm -rf ./build &&  . /venv/bin/activate && \
-    make px4_sitl
+    make px4_sitl -j16
 
 # Build px4_msgs
 RUN mkdir -p /msgs_ws/src
