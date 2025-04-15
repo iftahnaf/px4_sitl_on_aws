@@ -55,8 +55,9 @@ jobs:
 
       - name: Build and push simulation image
         run: |
+          git submodule sync --recursive
+          git submodule update --init --recursive --force
           cd PX4-Autopilot
-            git fetch --tags
             if ! git describe --tags --exact-match >/dev/null 2>&1; then
               echo "No Git tag found. Adding v1.16.0-beta1"
               git tag v1.16.0-beta1-440d76b
