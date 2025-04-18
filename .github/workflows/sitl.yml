@@ -97,7 +97,7 @@ jobs:
                 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
 
       - name: Report
-        run: cat /bags/topic_report.txt
+        run: cat ~/bags/topic_report.txt
           
       - name: Install AWS CLI and upload the bags
         run: |
