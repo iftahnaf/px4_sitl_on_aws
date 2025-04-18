@@ -9,7 +9,7 @@ image="$registry/$repo:$timestamp"
 
 echo "Building image: $image"
 
-docker buildx create --use
+docker buildx create --use --name builder || docker buildx use builder
 
 docker buildx build \
   --cache-from=type=local,src=/tmp/.buildx-cache \
