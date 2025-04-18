@@ -9,10 +9,12 @@ on:
 
 jobs:
   build:
+    name: Build Docker image
     uses: ./.github/workflows/build.yml
 
   start-runner:
     name: Start self-hosted EC2 runner
+    needs: build
     runs-on: ubuntu-latest
     outputs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
