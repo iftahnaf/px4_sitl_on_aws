@@ -117,9 +117,9 @@ def generate_launch_description():
 
     gz_sim_command = [
         "python3",
-        "/workspaces/px4_sitl_on_aws/PX4-Autopilot/Tools/simulation/gz/simulation-gazebo ",
-        "--headless "
-        "--overwrite",
+        "/workspaces/px4_sitl_on_aws/PX4-Autopilot/Tools/simulation/gz/simulation-gazebo",
+        " -headless"
+        " -overwrite",
     ]
 
     gz_sim = ExecuteProcess(
