@@ -15,7 +15,9 @@ import launch.logging
 import logging
 import time
 import os
+import sys
 import signal
+import numpy as np
 from launch import LaunchContext
 
 from rosbags.highlevel import AnyReader
@@ -29,6 +31,48 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y%m%d_%H%M%S'
 )
+
+try:
+    radius = int(sys.argv[4].split(":=")[1])
+except Exception:
+    launch.logging.get_logger().info(
+        "Radius not provided, using default value of 10.0"
+    )
+    radius = 10.0
+
+try:
+    altitude = int(sys.argv[5].split(":=")[1])
+except Exception:
+    launch.logging.get_logger().info(
+        "Altitude not provided, using default value of 30.0"
+    )
+    altitude = 30.0
+
+try:
+    omega = int(sys.argv[6].split(":=")[1])
+except Exception:
+    launch.logging.get_logger().info(
+        "Omega not provided, using default value of 0.5"
+    )
+    omega = 0.5
+
+try:
+    timeout_s = int(sys.argv[7].split(":=")[1])
+except Exception:
+    launch.logging.get_logger().info(
+        "Timeout not provided, using default value of 120.0"
+    )
+    timeout_s = 120.0
+
+radius = float(np.clip(radius, 10.0, 50.0))
+altitude = float(np.clip(altitude, 5.0, 50.0))
+omega = float(np.clip(omega, 0.2, 1.0))
+timeout_s = float(np.clip(timeout_s, 120.0, 300.0))
+
+logging.info(f"Radius: {radius}")
+logging.info(f"Altitude: {altitude}")
+logging.info(f"Omega: {omega}")
+logging.info(f"Timeout: {timeout_s}")
 
 def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: str, recorder: ExecuteProcess):
         time.sleep(1.0)
@@ -45,14 +89,10 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
             for conn, timestamp, raw in reader.messages():
                 message_counts[conn.topic] += 1
 
-        logging.info(f"Topics in bag: {bag_name}\n")
-        for topic, count in sorted(message_counts.items(), key=lambda x: x[0]):
-            if count > 10:
-                logging.info(f"{topic}: {count} messages")
-            elif count <= 10:
-                logging.warning(f"{topic}: only {count} messages")
-            else:
-                logging.error(f"{topic}: no messages")
+        with open("/bags/topic_report.txt", "w") as f:
+            f.write(f"Topics in bag: {bag_name}\n")
+            for topic, count in sorted(message_counts.items(), key=lambda x: x[0]):
+                f.write(f"{topic}: {count} messages\n")
 
         logging.info(f"Bag {bag_name} has been analyzed")
 
@@ -106,7 +146,7 @@ def generate_launch_description():
             namespace='px4_offboard',
             executable='offboard_control',
             name='control',
-            parameters= [{'radius': 10.0},{'altitude': 30.0},{'omega': 0.5}]
+            parameters= [{'radius': radius},{'altitude': altitude},{'omega': omega}]
         )
     
     bag_name = f'/bags/{time.strftime("%Y-%m-%d_%H:%M:%S", time.gmtime())}'
@@ -133,7 +173,7 @@ def generate_launch_description():
     )
 
     sys_shut_down_timer = TimerAction(
-        period=float(120.0),
+        period=float(timeout_s),
         actions=[
             LogInfo(msg="Timeout reached, shutting down the scenario."),
             EmitEvent(event=Shutdown(reason="Timeout reached")),

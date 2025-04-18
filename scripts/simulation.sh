@@ -7,4 +7,4 @@ source /workspaces/px4_sitl_on_aws/install/local_setup.bash
 pip install rosbags --break-system-packages
 
 # Launch the ROS2 simulation with the provided offsets
-ros2 launch px4_ci_aws ci.launch.py
+ros2 launch px4_ci_aws ci.launch.py radius:=$1 altitude:=$2 omega:=$3 timeout_s:=$4

@@ -2,10 +2,29 @@ name: Software in the Loop
 on:
   workflow_dispatch:
     inputs:
-      sim_type:
-        description: "Simulation type"
+      radius:
+        description: "Radius of the circle in meters [10.0, 50.0]"
         required: true
-        default: "x500"
+        default: 30.0
+        type: number
+
+      altitude:
+        description: "Altitude of the circle in meters [10.0, 50.0]"
+        required: true
+        default: 30.0
+        type: number
+
+      angular_velocity:
+        description: "Angular velocity of the drone in rad/s [0.2, 1.0]"
+        required: true
+        default: 5.0
+        type: number
+
+      duration:
+        description: "Duration of the simulation in seconds [10.0, 50.0]"
+        required: true
+        default: 30.0
+        type: number
 
 jobs:
   build:
@@ -63,8 +82,10 @@ jobs:
         run: |
           mkdir bags
           docker pull 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
-          docker run --net=host --ipc=host --privileged -v ~/bags:/bags/ 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
-          echo "Simulation type is ${{ inputs.sim_type }}"
+          docker run --net=host --ipc=host --privileged -v ~/bags:/bags/ 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest ./simulation.sh ${{ inputs.radius }} ${{ inputs.altitude }} ${{ inputs.angular_velocity }} ${{ inputs.duration }}
+
+      - name: Report
+        run: cat /bags/topic_report.txt
           
       - name: Install AWS CLI and upload the bags
         run: |
