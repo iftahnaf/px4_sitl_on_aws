@@ -17,13 +17,13 @@ on:
       angular_velocity:
         description: "Angular velocity of the drone in rad/s [0.2, 1.0]"
         required: true
-        default: 5.0
+        default: 0.5
         type: number
 
       duration:
-        description: "Duration of the simulation in seconds [10.0, 50.0]"
+        description: "Duration of the simulation in seconds [120.0, 300.0]"
         required: true
-        default: 30.0
+        default: 120.0
         type: number
 
 jobs:
