@@ -15,9 +15,7 @@ import launch.logging
 import logging
 import time
 import os
-import sys
 import signal
-import numpy as np
 from launch import LaunchContext
 
 from rosbags.highlevel import AnyReader
@@ -32,48 +30,12 @@ logging.basicConfig(
     datefmt='%Y%m%d_%H%M%S'
 )
 
-try:
-    radius = int(sys.argv[4].split(":=")[1])
-except Exception:
-    launch.logging.get_logger().info(
-        "Radius not provided, using default value of 10.0"
-    )
-    radius = 10.0
-
-try:
-    altitude = int(sys.argv[5].split(":=")[1])
-except Exception:
-    launch.logging.get_logger().info(
-        "Altitude not provided, using default value of 30.0"
-    )
-    altitude = 30.0
-
-try:
-    omega = int(sys.argv[6].split(":=")[1])
-except Exception:
-    launch.logging.get_logger().info(
-        "Omega not provided, using default value of 0.5"
-    )
-    omega = 0.5
-
-try:
-    timeout_s = int(sys.argv[7].split(":=")[1])
-except Exception:
-    launch.logging.get_logger().info(
-        "Timeout not provided, using default value of 120.0"
-    )
-    timeout_s = 120.0
-
-radius = float(np.clip(radius, 10.0, 50.0))
-altitude = float(np.clip(altitude, 5.0, 50.0))
-omega = float(np.clip(omega, 0.2, 1.0))
-timeout_s = float(np.clip(timeout_s, 120.0, 300.0))
-
-logging.info(f"Radius: {radius}")
-logging.info(f"Altitude: {altitude}")
-logging.info(f"Omega: {omega}")
-logging.info(f"Timeout: {timeout_s}")
-
+def safe_float(env_var: str, default: float) -> float:
+    try:
+        return float(os.environ.get(env_var, default))
+    except ValueError:
+        return default
+    
 def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: str, recorder: ExecuteProcess):
         time.sleep(1.0)
         pid = recorder.process_details['pid']
@@ -95,6 +57,16 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
                 f.write(f"{topic}: {count} messages\n")
 
         logging.info(f"Bag {bag_name} has been analyzed")
+
+radius = safe_float("RADIUS", 10.0)
+altitude = safe_float("ALTITUDE", 30.0)
+omega = safe_float("OMEGA", 0.5)
+timeout_s = safe_float("TIMEOUT_S", 120.0)
+
+logging.info(f"Radius: {radius}")
+logging.info(f"Altitude: {altitude}")
+logging.info(f"Omega: {omega}")
+logging.info(f"Timeout: {timeout_s}")
 
 def generate_launch_description():
 
