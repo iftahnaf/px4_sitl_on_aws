@@ -1,11 +1,8 @@
 name: Build
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   build:
@@ -22,9 +19,6 @@ jobs:
 
       - name: Cleanup Docker
         run: docker system prune -af || true
-      
-      - name: Cleanup Docker buildx cache
-        run: rm -rf /tmp/.buildx-cache || true
 
       - name: Checkout code
         uses: actions/checkout@v4
