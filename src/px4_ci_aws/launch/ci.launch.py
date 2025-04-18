@@ -73,7 +73,7 @@ def generate_launch_description():
     px4_launch_command = (
         "cd /workspaces/px4_sitl_on_aws/PX4-Autopilot && sleep 2 &&"
         + " HEADLESS=1 PX4_SYS_AUTOSTART=4001"
-        + " PX4_SIM_MODEL=gz_x500 ./build/px4_sitl_default/bin/px4"
+        + " PX4_GZ_MODEL_NAME=gz_x500 ./build/px4_sitl_default/bin/px4"
     )
 
     px4_proc = ExecuteProcess(
