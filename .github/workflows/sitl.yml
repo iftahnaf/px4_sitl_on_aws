@@ -90,8 +90,11 @@ jobs:
           docker pull 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
           docker run --net=host --ipc=host --privileged \
                 -v ~/bags:/bags/ \
-                718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest \
-                bash -c "./simulation.sh '${{ inputs.radius }}' '${{ inputs.altitude }}' '${{ inputs.angular_velocity }}' '${{ inputs.duration }}'"
+                -e RADIUS=${{ inputs.radius }} \
+                -e ALTITUDE=${{ inputs.altitude }} \
+                -e OMEGA=${{ inputs.angular_velocity }} \
+                -e TIMEOUT_S=${{ inputs.duration }} \
+                718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
 
       - name: Report
         run: cat /bags/topic_report.txt
