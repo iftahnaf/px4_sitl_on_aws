@@ -31,6 +31,8 @@ class ArmOffboardNode(Node):
         self.offboard_state = OffboardState.INIT
         self.rtl_triggered = False
 
+        self.offboard_time_s = self.declare_parameter('offboard_time_s', 30.0).value
+
         qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.BEST_EFFORT,
             durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
@@ -82,7 +84,7 @@ class ArmOffboardNode(Node):
             self.get_logger().info("Vehicle is armed and in OFFBOARD mode.", throttle_duration_sec=5.0)
             current_time_s = self.get_clock().now().seconds_nanoseconds()[0] + self.get_clock().now().seconds_nanoseconds()[1] / 1e9
             delta_time_s = current_time_s - self.offboard_init_time_s
-            if delta_time_s > 30.0:
+            if delta_time_s > self.offboard_time_s:
                 self.offboard_state = OffboardState.RTL
                 self.get_logger().info("RTL command will be sent.", throttle_duration_sec=5.0)
         

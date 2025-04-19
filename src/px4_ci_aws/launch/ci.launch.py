@@ -62,11 +62,13 @@ radius = safe_float("RADIUS", 10.0)
 altitude = safe_float("ALTITUDE", 30.0)
 omega = safe_float("OMEGA", 0.5)
 timeout_s = safe_float("TIMEOUT_S", 120.0)
+offboard_time_s = safe_float("OFFBOARD_TIME_S", 30.0)
 
 logging.info(f"Radius: {radius}")
 logging.info(f"Altitude: {altitude}")
 logging.info(f"Omega: {omega}")
 logging.info(f"Timeout: {timeout_s}")
+logging.info(f"Offboard Time: {offboard_time_s}")
 
 def generate_launch_description():
 
@@ -111,6 +113,7 @@ def generate_launch_description():
             package='px4_ci_aws',
             executable='px4_state_machine.py',
             name='px4_state_machine',
+            parameters=[{'offboard_time_s': offboard_time_s}],
         )
     
     node_offboard = Node(
