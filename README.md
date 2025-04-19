@@ -4,7 +4,7 @@
 
 This repository demonstrates an automated workflow for running PX4 SITL (Software-In-The-Loop) simulations on AWS infrastructure — fully managed by GitHub Actions.
 
-Whenever code changes are made to any of the ROS 2 nodes, a new Docker image is built, containing the required environment to run the SITL simulation. Then, an EC2 instance is launched, pulls the simulation Docker image from ECR, and runs the scenario.
+Whenever triggered, a new Docker image is built, containing the required environment to run the SITL simulation. Then, an EC2 instance is launched, pulls the simulation Docker image from ECR, and runs the scenario.
 
 Once the simulation ends, a simple analysis script runs to count the number of messages per topic, helping to detect bugs or anomalies. Finally, the ROS 2 bag file that was recorded during the simulation is uploaded to an S3 bucket for storage and later analysis.
 
