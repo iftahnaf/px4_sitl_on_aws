@@ -1,0 +1,70 @@
+name: Tag New Version
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          git fetch --tags
+          tag=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          echo "latest=$tag" >> $GITHUB_OUTPUT
+
+      - name: Determine bump type from PR label
+        id: bump
+        run: |
+          label=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels \
+              | jq -r '.[].name' | grep '^release:' || true)
+
+          echo "Label: $label"
+
+          case "$label" in
+            release:major) bump="major" ;;
+            release:minor) bump="minor" ;;
+            release:patch) bump="patch" ;;
+            *) echo "No valid release label found"; exit 1 ;;
+          esac
+
+          echo "bump=$bump" >> $GITHUB_OUTPUT
+
+      - name: Bump version and create tag
+        id: bump_tag
+        run: |
+          old="${{ steps.get_tag.outputs.latest }}"
+          echo "Previous tag: $old"
+
+          # Strip "v" and split
+          version="${old#v}"
+          IFS='.' read -r major minor patch <<< "$version"
+
+          case "${{ steps.bump.outputs.bump }}" in
+            major) ((major++)); minor=0; patch=0 ;;
+            minor) ((minor++)); patch=0 ;;
+            patch) ((patch++)) ;;
+          esac
+
+          new_tag="v$major.$minor.$patch"
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag "$new_tag"
+          git push origin "$new_tag"
+
+      - name: Output new tag
+        run: echo "Tagged ${{ steps.bump_tag.outputs.new_tag }}"

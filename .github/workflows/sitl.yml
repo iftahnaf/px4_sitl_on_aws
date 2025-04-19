@@ -1,5 +1,8 @@
 name: Software in the Loop
 on:
+  push:
+    tags:
+      - 'v*'  
   workflow_dispatch:
     inputs:
       radius:
@@ -105,7 +108,10 @@ jobs:
                 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
 
       - name: Report
-        run: cat ~/bags/topic_report.txt
+        run: |
+          cat ~/bags/topic_report.txt
+          current_time=$(date +"%Y-%m-%d_%H-%M-%S")
+          mv ~/bags/topic_report.txt ~/bags/topic_report_${current_time}.txt
           
       - name: Install AWS CLI and upload the bags
         run: |
