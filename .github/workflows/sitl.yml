@@ -26,6 +26,12 @@ on:
         default: 120.0
         type: number
 
+      offboard_time_s:
+        description: "Time in seconds to stay in OFFBOARD mode before RTL [10.0, 120.0]"
+        required: true
+        default: 30.0
+        type: number
+
 jobs:
   build:
     name: Build Docker image
@@ -86,6 +92,7 @@ jobs:
           echo "Altitude: ${{ inputs.altitude }}"
           echo "Angular Velocity: ${{ inputs.angular_velocity }}"
           echo "Duration: ${{ inputs.duration }}"
+          echo "Offboard Time: ${{ inputs.offboard_time_s }}"
           echo "Running simulation..."
           docker pull 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
           docker run --net=host --ipc=host --privileged \
@@ -94,6 +101,7 @@ jobs:
                 -e ALTITUDE=${{ inputs.altitude }} \
                 -e OMEGA=${{ inputs.angular_velocity }} \
                 -e TIMEOUT_S=${{ inputs.duration }} \
+                -e OFFBOARD_TIME_S=${{ inputs.offboard_time_s }} \
                 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
 
       - name: Report
