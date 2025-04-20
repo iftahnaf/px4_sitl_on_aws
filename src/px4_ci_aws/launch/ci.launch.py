@@ -16,6 +16,7 @@ import logging
 import time
 import os
 import signal
+import datetime
 from launch import LaunchContext
 
 from rosbags.highlevel import AnyReader
@@ -44,19 +45,59 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
         logging.info(f"killed recorded on process {pid}")
         time.sleep(1.0)
 
+        bag_path = Path(bag_name)
         message_counts = defaultdict(int)
+        start_time = None
+        end_time = None
 
-        with AnyReader([Path(bag_name)]) as reader:
+        with AnyReader([bag_path]) as reader:
             reader.open()
             for conn, timestamp, raw in reader.messages():
-                message_counts[conn.topic] += 1
+                topic = conn.topic
+                message_counts[topic] += 1
+                if start_time is None:
+                    start_time = timestamp
+                end_time = timestamp
 
-        with open("/bags/topic_report.txt", "w") as f:
-            f.write(f"Topics in bag: {bag_name}\n")
-            for topic, count in sorted(message_counts.items(), key=lambda x: x[0]):
-                f.write(f"{topic}: {count} messages\n")
+        utc = datetime.timezone.utc
+        start_str = datetime.datetime.fromtimestamp(start_time / 1e9, tz=utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+        end_str = datetime.datetime.fromtimestamp(end_time / 1e9, tz=utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+        duration = str(datetime.timedelta(seconds=(end_time - start_time) / 1e9))
 
-        logging.info(f"Bag {bag_name} has been analyzed")
+        lines = []
+        lines.append("📝 PX4 SITL Simulation Report")
+        lines.append("================================")
+        lines.append(f"**Bag File:** `{bag_path}`")
+        lines.append(f"**Total Topics:** {len(message_counts)}")
+        lines.append(f"**Total Messages:** {sum(message_counts.values())}")
+        lines.append(f"**Start Time:** {start_str}")
+        lines.append(f"**End Time:** {end_str}")
+        lines.append(f"**Duration:** {duration}")
+        lines.append("\n---\n")
+        lines.append("### 📊 Message Count by Topic\n")
+        lines.append("| Topic | Count |")
+        lines.append("|-------|-------|")
+
+        warnings = []
+        for topic, count in sorted(message_counts.items(), key=lambda x: x[1], reverse=True):
+            warn = " ⚠️" if count < 10 else ""
+            if warn:
+                warnings.append((topic, count))
+            lines.append(f"| `{topic}` | {count}{warn} |")
+
+        if warnings:
+            lines.append("\n---\n### ⚠️ Warnings\n")
+            for topic, count in warnings:
+                msg = "No messages." if count == 0 else f"Only {count} messages."
+                lines.append(f"- **{topic}**: {msg}")
+
+        lines.append("\n---\nBag analyzed by `px4_ci_aws`.")
+
+        report_path = Path("/bags/topic_report.md")
+        with open(report_path, "w") as f:
+            f.write("\n".join(lines))
+
+        logging.info(f"Markdown report written to {report_path}")
 
 radius = safe_float("RADIUS", 10.0)
 altitude = safe_float("ALTITUDE", 30.0)
