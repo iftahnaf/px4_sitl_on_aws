@@ -54,7 +54,10 @@ jobs:
           echo "Bump type: $bump"
 
           version="${old#v}"
+          echo "Version without 'v': $version"
+
           IFS='.' read -r major minor patch <<< "$version"
+          echo "Version parts: major=$major, minor=$minor, patch=$patch"
 
           case "$bump" in
             major) ((major++)); minor=0; patch=0 ;;
