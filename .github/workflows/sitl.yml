@@ -113,9 +113,9 @@ jobs:
 
       - name: Report
         run: |
-          cat ~/bags/topic_report.txt
+          cat ~/bags/topic_report.md
           current_time=$(date +"%Y-%m-%d_%H-%M-%S")
-          mv ~/bags/topic_report.txt ~/bags/topic_report_${current_time}.txt
+          mv ~/bags/topic_report.md ~/bags/topic_report_${current_time}.md
           
       - name: Install AWS CLI and upload the bags
         run: |
