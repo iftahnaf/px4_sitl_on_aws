@@ -49,12 +49,14 @@ jobs:
         id: bump_tag
         run: |
           old="${{ steps.get_tag.outputs.latest }}"
+          bump="${{ steps.bump.outputs.bump }}"
           echo "Previous tag: $old"
+          echo "Bump type: $bump"
 
           version="${old#v}"
           IFS='.' read -r major minor patch <<< "$version"
 
-          case "${{ steps.bump.outputs.bump }}" in
+          case "$bump" in
             major) ((major++)); minor=0; patch=0 ;;
             minor) ((minor++)); patch=0 ;;
             patch) ((patch++)) ;;
