@@ -48,7 +48,6 @@ jobs:
       - name: Bump version and create tag
         id: bump_tag
         run: |
-          set -euo pipefail
           old="${{ steps.get_tag.outputs.latest }}"
           bump="${{ steps.bump.outputs.bump }}"
           echo "Previous tag: $old"
@@ -57,27 +56,31 @@ jobs:
           version="${old#v}"
           echo "Version without 'v': $version"
 
-          IFS='.' read -r major minor patch <<< "$version"
-          echo "Version parts: major=$major, minor=$minor, patch=$patch"
+          IFS='.' read major minor patch <<< "$version"
+          echo "Parsed: major=$major, minor=$minor, patch=$patch"
 
-          if ! [[ "$major" =~ ^[0-9]+$ && "$minor" =~ ^[0-9]+$ && "$patch" =~ ^[0-9]+$ ]]; then
-            echo "Error: Tag parts are not valid numbers"
+          if [ "$bump" = "major" ]; then
+            major=$(expr "$major" + 1)
+            minor=0
+            patch=0
+          elif [ "$bump" = "minor" ]; then
+            minor=$(expr "$minor" + 1)
+            patch=0
+          elif [ "$bump" = "patch" ]; then
+            patch=$(expr "$patch" + 1)
+          else
+            echo "Invalid bump type: $bump"
             exit 1
           fi
 
-          case "$bump" in
-            major) ((major++)); minor=0; patch=0 ;;
-            minor) ((minor++)); patch=0 ;;
-            patch) ((patch++)) ;;
-          esac
-
-          new_tag="v$major.$minor.$patch"
-          echo "new_tag=$new_tag" >> "$GITHUB_OUTPUT"
+          new_tag="v${major}.${minor}.${patch}"
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+          echo "Generated new tag: $new_tag"
 
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          if git tag | grep -q "$new_tag"; then
+          if git tag | grep -q "^$new_tag$"; then
             echo "Tag $new_tag already exists"
           else
             git tag "$new_tag"
