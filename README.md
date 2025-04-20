@@ -2,8 +2,6 @@
 ![Rolling](https://github.com/iftahnaf/px4_sitl_on_aws/actions/workflows/rolling.yml/badge.svg)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/iftahnaf/px4_sitl_on_aws?label=tag&sort=semver)
 ![GitHub](https://img.shields.io/github/license/iftahnaf/px4_sitl_on_aws)
-![Repo Size](https://img.shields.io/github/repo-size/iftahnaf/px4_sitl_on_aws)
-![Top Lang](https://img.shields.io/github/languages/top/iftahnaf/px4_sitl_on_aws)
 ![Last Commit](https://img.shields.io/github/last-commit/iftahnaf/px4_sitl_on_aws)
 ![Issues](https://img.shields.io/github/issues/iftahnaf/px4_sitl_on_aws)
 ![PRs](https://img.shields.io/github/issues-pr/iftahnaf/px4_sitl_on_aws)

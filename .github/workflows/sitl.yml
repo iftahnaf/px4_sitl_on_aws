@@ -1,8 +1,12 @@
 name: Software in the Loop
 on:
+  repository_dispatch:
+    types: [run-tagged-workflow]
+
   push:
     tags:
       - 'v*'  
+      
   workflow_dispatch:
     inputs:
       radius:
