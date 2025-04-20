@@ -18,8 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Ensure we're on the main branch
-        run: |
-          git checkout main
+        run: git checkout main
 
       - name: Get latest tag
         id: get_tag
@@ -32,8 +31,8 @@ jobs:
         id: bump
         run: |
           label=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels \
-              | jq -r '.[].name' | grep '^release:' || true)
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels \
+            | jq -r '.[].name' | grep '^release:' || true)
 
           echo "Label: $label"
 
@@ -71,9 +70,7 @@ jobs:
             echo "Tag $new_tag already exists"
           else
             git tag "$new_tag"
-            git push origin "$new_tag"
-            # Alternative with PAT:
-            # git push https://${{ secrets.REPO_TOKEN }}@github.com/${{ github.repository }} "$new_tag"
+            git push https://x-access-token:${{ secrets.REPO_TOKEN }}@github.com/${{ github.repository }} "$new_tag"
           fi
 
       - name: Output new tag
