@@ -1,12 +1,15 @@
 name: Software in the Loop
 on:
-  repository_dispatch:
-    types: [run-tagged-workflow]
-
-  push:
-    tags:
-      - 'v*'  
-      
+  workflow_call:
+    secrets:
+      REPO_TOKEN:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_REGION:
+        required: true
   workflow_dispatch:
     inputs:
       radius:
@@ -40,110 +43,109 @@ on:
         type: number
 
 jobs:
-  build:
-    name: Build Docker image
-    uses: ./.github/workflows/build.yml
-    secrets:
-      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
+    start-runner:
+      name: Start self-hosted EC2 runner
+      runs-on: ubuntu-latest
+      outputs:
+        label: ${{ steps.start-ec2-runner.outputs.label }}
+        ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+      steps:
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+        - name: Start EC2 runner
+          id: start-ec2-runner
+          uses: machulav/ec2-github-runner@v2
+          with:
+            mode: start
+            github-token: ${{ secrets.REPO_TOKEN }}
+            ec2-image-id: ami-0221cb43bdc5b320b
+            ec2-instance-type: c6i.2xlarge
+            subnet-id: subnet-0dea4abf480e9a1bb
+            security-group-id: sg-052634c0405d6a10b
+            iam-role-name: px4_sitl_on_aws     
 
-  start-runner:
-    name: Start self-hosted EC2 runner
-    needs: build
-    runs-on: ubuntu-latest
-    outputs:
-      label: ${{ steps.start-ec2-runner.outputs.label }}
-      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Start EC2 runner
-        id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v2
-        with:
-          mode: start
-          github-token: ${{ secrets.REPO_TOKEN }}
-          ec2-image-id: ami-0221cb43bdc5b320b
-          ec2-instance-type: c6i.2xlarge
-          subnet-id: subnet-0dea4abf480e9a1bb
-          security-group-id: sg-052634c0405d6a10b
-          iam-role-name: px4_sitl_on_aws
-          
-  do-the-job:
-    name: Run SITL from Docker Image
-    needs: start-runner
-    runs-on: ${{ needs.start-runner.outputs.label }}
-    steps:
+    do-the-job:
+      name: Run SITL from Docker Image
+      needs: start-runner
+      runs-on: ${{ needs.start-runner.outputs.label }}
+      outputs:
+        s3_path: ${{ steps.set-output.outputs.s3_path }}
+      steps:
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+            
+        - name: Login to Amazon ECR
+          uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Pull and Run the Docker Image
-        run: |
-          mkdir bags
-          echo "Running simulation with the following parameters:"
-          echo "Radius: ${{ inputs.radius }}"
-          echo "Altitude: ${{ inputs.altitude }}"
-          echo "Angular Velocity: ${{ inputs.angular_velocity }}"
-          echo "Duration: ${{ inputs.duration }}"
-          echo "Offboard Time: ${{ inputs.offboard_time_s }}"
-          echo "Running simulation..."
-          docker pull 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
-          docker run --net=host --ipc=host --privileged \
-                -v ~/bags:/bags/ \
-                -e RADIUS=${{ inputs.radius }} \
-                -e ALTITUDE=${{ inputs.altitude }} \
-                -e OMEGA=${{ inputs.angular_velocity }} \
-                -e TIMEOUT_S=${{ inputs.duration }} \
-                -e OFFBOARD_TIME_S=${{ inputs.offboard_time_s }} \
-                718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
+        - name: Pull the Docker Image
+          run: |
+            mkdir bags
+            docker pull 718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
 
-      - name: Report
-        run: |
-          cat ~/bags/topic_report.md
-          current_time=$(date +"%Y-%m-%d_%H-%M-%S")
-          mv ~/bags/topic_report.md ~/bags/topic_report_${current_time}.md
-          
-      - name: Install AWS CLI and upload the bags
-        run: |
-            sudo apt-get update
-            sudo apt-get install -y curl unzip zip
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-            aws s3 cp ~/bags s3://px4-sitl-on-aws-bags/ --recursive
+        - name: Run the Docker Image
+          run: |
+            echo "Running simulation with the following parameters:"
+            echo "Radius: ${{ inputs.radius }}"
+            echo "Altitude: ${{ inputs.altitude }}"
+            echo "Angular Velocity: ${{ inputs.angular_velocity }}"
+            echo "Duration: ${{ inputs.duration }}"
+            echo "Offboard Time: ${{ inputs.offboard_time_s }}"
+            echo "Running simulation..."
+            docker run --net=host --ipc=host --privileged \
+                  -v ~/bags:/bags/ \
+                  -e RADIUS=${{ inputs.radius }} \
+                  -e ALTITUDE=${{ inputs.altitude }} \
+                  -e OMEGA=${{ inputs.angular_velocity }} \
+                  -e TIMEOUT_S=${{ inputs.duration }} \
+                  -e OFFBOARD_TIME_S=${{ inputs.offboard_time_s }} \
+                  718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
 
-  stop-runner:
-    name: Stop self-hosted EC2 runner
-    needs:
-      - start-runner
-      - do-the-job
-    runs-on: ubuntu-latest
-    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Stop EC2 runner
-        uses: machulav/ec2-github-runner@v2
-        with:
-          mode: stop
-          github-token: ${{ secrets.REPO_TOKEN }}
-          label: ${{ needs.start-runner.outputs.label }}
-          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
+        - name: Topic Report
+          run: |
+            cat ~/bags/topic_report.md
+            current_time=$(date +"%Y-%m-%d_%H-%M-%S")
+            mv ~/bags/topic_report.md ~/bags/topic_report_${current_time}.md
+            
+        - name: Install AWS CLI and upload the bags
+          run: |
+              sudo apt-get update
+              sudo apt-get install -y curl unzip zip
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+              aws s3 cp ~/bags s3://px4-sitl-on-aws-bags/ --recursive
+  
+        - name: Set S3 path output
+          id: set-output
+          run: echo "s3_path=s3://px4-sitl-on-aws-bags/" >> "$GITHUB_OUTPUT"
+
+    stop-runner:
+      name: Stop self-hosted EC2 runner
+      needs:
+        - start-runner
+        - do-the-job
+      runs-on: ubuntu-latest
+      if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+      steps:
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+        - name: Stop EC2 runner
+          uses: machulav/ec2-github-runner@v2
+          with:
+            mode: stop
+            github-token: ${{ secrets.REPO_TOKEN }}
+            label: ${{ needs.start-runner.outputs.label }}
+            ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
