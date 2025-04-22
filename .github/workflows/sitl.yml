@@ -10,6 +10,12 @@ on:
         required: true
       AWS_REGION:
         required: true
+
+    outputs:
+      s3_path:
+        description: "The full S3 path to the uploaded bag"
+        value: ${{ jobs.do-the-job.outputs.s3_path }}
+        
   workflow_dispatch:
     inputs:
       radius:

@@ -1,0 +1,57 @@
+name: Analyze Bag Data
+
+on:
+  workflow_call:
+    inputs:
+      s3_path:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_REGION:
+        required: true
+      REPO_TOKEN:
+        required: true
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+
+      - name: Install AWS CLI and Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl unzip zip python3-pip
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+          pip3 install -r requirements.txt
+
+      - name: Download bag file from S3
+        run: |
+          mkdir -p bag_data
+          aws s3 cp "${{ inputs.s3_path }}" ./bag_data/ --recursive
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Run bag analysis
+        run: |
+          python3 ./scripts/bag_analysis.py ./bag_data
+          echo "Analysis complete."
+
+      - name: Commit and push analysis result
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add *.md
+          git commit -m "docs: add bag analysis report from ${{ inputs.s3_path }}"
+          git push

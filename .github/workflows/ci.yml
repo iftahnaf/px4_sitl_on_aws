@@ -28,3 +28,15 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
     needs: build
+
+  data:
+    name: Run Bag Analysis
+    uses: ./.github/workflows/data.yml
+    needs: sitl
+    with:
+      s3_path: ${{ needs.sitl.outputs.s3_path }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
