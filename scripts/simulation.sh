@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2025, Iftach Naftaly <iftahnaf@gmail.com>
+
 set -e
 
 # Source ROS and workspace setup

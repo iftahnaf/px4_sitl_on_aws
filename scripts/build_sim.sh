@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2025, Iftach Naftaly <iftahnaf@gmail.com>
 set -e
 
 registry="718459739973.dkr.ecr.eu-west-1.amazonaws.com"
