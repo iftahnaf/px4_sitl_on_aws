@@ -40,3 +40,12 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+
+  release:
+    name: Trigger GitHub Release
+    uses: ./.github/workflows/release.yml
+    needs: data
+    with:
+      tag: ${{ github.ref_name }}
+    secrets:
+      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}

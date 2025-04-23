@@ -53,6 +53,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add *.md
+          git add '**/*.md'
           git commit -m "docs: add bag analysis report from ${{ inputs.s3_path }}"
           git push
