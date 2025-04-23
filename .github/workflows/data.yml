@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2025, Iftach Naftaly <iftahnaf@gmail.com>
 name: Analyze Bag Data
 
 on:
@@ -53,6 +55,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add *.md
+          git add '**/*.md'
           git commit -m "docs: add bag analysis report from ${{ inputs.s3_path }}"
           git push

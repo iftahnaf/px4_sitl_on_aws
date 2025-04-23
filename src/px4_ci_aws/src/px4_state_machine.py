@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2025, Iftach Naftaly <iftahnaf@gmail.com>
+
 import rclpy
 from rclpy.node import Node
 from rclpy.clock import Clock
