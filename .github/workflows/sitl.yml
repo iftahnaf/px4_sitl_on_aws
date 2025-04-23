@@ -52,7 +52,7 @@ on:
 
 jobs:
     start-runner:
-      name: Start self-hosted EC2 runner
+      name: Start EC2
       runs-on: ubuntu-latest
       outputs:
         label: ${{ steps.start-ec2-runner.outputs.label }}
@@ -77,7 +77,7 @@ jobs:
             iam-role-name: px4_sitl_on_aws     
 
     do-the-job:
-      name: Run SITL from Docker Image
+      name: Run SITL
       needs: start-runner
       runs-on: ${{ needs.start-runner.outputs.label }}
       outputs:
@@ -137,7 +137,7 @@ jobs:
           run: echo "s3_path=s3://px4-sitl-on-aws-bags/" >> "$GITHUB_OUTPUT"
 
     stop-runner:
-      name: Stop self-hosted EC2 runner
+      name: Stop EC2
       needs:
         - start-runner
         - do-the-job
