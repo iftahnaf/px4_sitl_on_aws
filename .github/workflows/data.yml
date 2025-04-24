@@ -8,6 +8,9 @@ on:
       s3_path:
         required: true
         type: string
+      bag_file_name:
+        required: true
+        type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -34,12 +37,11 @@ jobs:
           verbose: false
           arch: amd64
 
-      - name: Download bag file from S3
+      - name: Download latest bag file from S3
         run: |
           mkdir -p data
-          echo "Downloading bag file from S3..."
-          echo "S3 path: ${{ inputs.s3_path }}"
-          aws s3 cp "${{ inputs.s3_path }}" ./data/ --recursive
+          echo "Downloading latest version bag file from S3..."
+          aws s3 cp "${{ inputs.s3_path }}${{ inputs.bag_file_name }}" ./data/${{ inputs.bag_file_name }} --recursive
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -47,13 +49,13 @@ jobs:
 
       - name: Run bag analysis
         run: |
-          python3 ./scripts/bag_analysis.py ./data
+          python3 ./scripts/bag_analysis.py ./data/${{ inputs.bag_file_name }}
           echo "Analysis complete."
 
       - name: Commit and push analysis result
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add '**/*.md'
-          git commit -m "docs: add bag analysis report from ${{ inputs.s3_path }}"
+          git add '**/results/*.md'
+          git commit -m "docs: add bag analysis report from ${{ inputs.bag_file_name }}"
           git push
