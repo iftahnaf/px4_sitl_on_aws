@@ -107,12 +107,14 @@ altitude = safe_float("ALTITUDE", 30.0)
 omega = safe_float("OMEGA", 0.5)
 timeout_s = safe_float("TIMEOUT_S", 120.0)
 offboard_time_s = safe_float("OFFBOARD_TIME_S", 30.0)
+bag_name = os.environ.get("BAG_NAME", "latest")
 
 logging.info(f"Radius: {radius}")
 logging.info(f"Altitude: {altitude}")
 logging.info(f"Omega: {omega}")
 logging.info(f"Timeout: {timeout_s}")
 logging.info(f"Offboard Time: {offboard_time_s}")
+logging.info(f"Bag Name: {bag_name}")
 
 def generate_launch_description():
 
@@ -168,7 +170,7 @@ def generate_launch_description():
             parameters= [{'radius': radius},{'altitude': altitude},{'omega': omega}]
         )
     
-    bag_name = f'/bags/{time.strftime("%Y-%m-%d_%H:%M:%S", time.gmtime())}'
+    bag_path = f'/bags/{bag_name}'
     recorder = ExecuteProcess(
             cmd=[
                 "ros2",
@@ -176,7 +178,7 @@ def generate_launch_description():
                 "record",
                 "-a",
                 "-o",
-                f"{bag_name}",
+                f"{bag_path}",
 
             ],
         )
@@ -204,7 +206,7 @@ def generate_launch_description():
         OnShutdown(
             on_shutdown=[
                 LogInfo(msg='Analyzing the bag'),
-                OpaqueFunction(function=post_process, args=[analysis_configuration, bag_name, recorder])
+                OpaqueFunction(function=post_process, args=[analysis_configuration, bag_path, recorder])
             ]
         )
     )

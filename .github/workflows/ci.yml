@@ -48,6 +48,7 @@ jobs:
     if: always()
     with:
       s3_path: ${{ needs.sitl.outputs.s3_path }}
+      bag_file_name: ${{ needs.sitl.outputs.bag_file_name }}
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

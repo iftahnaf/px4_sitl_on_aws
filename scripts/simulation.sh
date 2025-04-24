@@ -17,5 +17,6 @@ echo "Altitude: $ALTITUDE"
 echo "Omega: $OMEGA"
 echo "Timeout: $TIMEOUT_S"
 echo "Offboard Time: $OFFBOARD_TIME_S"
+echo "Bag Name: $BAG_NAME"
 
 ros2 launch px4_ci_aws ci.launch.py
