@@ -16,7 +16,7 @@ def main():
     results_dir = "results"
     os.makedirs(results_dir, exist_ok=True)
 
-    report_path = os.path.join(results_dir, f"{bag_path}_report.md")
+    report_path = os.path.join(results_dir, f"{os.path.basename(bag_path)}_report.md")
     with open(report_path, "w") as f:
         f.write("# Bag Analysis Report\n\n")
         f.write(f"Hello, world!\n\n")
