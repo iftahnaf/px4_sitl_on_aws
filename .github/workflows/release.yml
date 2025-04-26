@@ -17,19 +17,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: Get Tag Commit SHA
+        id: get_tag_commit
+        run: |
+          echo "Fetching tag commit..."
+          commit_sha=$(git rev-list -n 1 ${{ inputs.tag }})
+          echo "commit_sha=$commit_sha" >> $GITHUB_OUTPUT
 
       - name: Get Latest Report From results Folder
         id: get_latest_report
         run: |
           echo "Fetching latest report..."
           latest_report=$(ls -t results/*.pdf | head -n 1)
-          echo "Latest report: $latest_report"
           echo "report_path=$latest_report" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag }}
+          target_commitish: ${{ steps.get_tag_commit.outputs.commit_sha }}
           generate_release_notes: true
           files: ${{ steps.get_latest_report.outputs.report_path }}
         env:
