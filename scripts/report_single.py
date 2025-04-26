@@ -26,7 +26,6 @@ class SingleReport:
         self.typestore: Typestore = register_custom_msgs(px4_msgs)
 
         results_dir = "/workspaces/px4_sitl_on_aws/results"
-        os.makedirs(results_dir, exist_ok=True)  # Create results dir if not exists
 
         self.report_path = os.path.join(
             results_dir, f"{os.path.basename(bag_path)}_report.md"
