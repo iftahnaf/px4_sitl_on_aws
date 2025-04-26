@@ -1,3 +1,6 @@
 build/**
 log/**
 install/**
+data/**
+**/__pycache__/**
+results/*.png
