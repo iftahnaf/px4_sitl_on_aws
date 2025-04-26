@@ -57,7 +57,7 @@ jobs:
 
       - name: Run bag analysis
         run: |
-          python3 ./scripts/report_single.py ./data/${{ inputs.bag_file_name }}
+          python3 ./scripts/report_single.py ./data/${{ inputs.bag_file_name }} --commit_id ${{ github.sha }} --author ${{ github.actor }}
           echo "Analysis complete."
 
       - name: Commit and push analysis result
@@ -65,6 +65,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add results/*.pdf
-          git add results/*.png
           git commit -m "docs: add bag analysis report from ${{ inputs.bag_file_name }}"
           git push origin main
