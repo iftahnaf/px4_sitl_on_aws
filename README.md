@@ -25,9 +25,11 @@ flowchart TB
     E --> F[Launch EC2 Instance]
     F --> G[Pull Docker Image from ECR]
     G --> H[Run PX4 SITL Simulation]
-    H --> I[Run Analysis Script]
+    H --> I[Run Topic Analysis]
     I --> J[Upload ROS 2 Bag File to S3]
     J --> K[Terminate EC2 Instance]
+    K --> L[Generate Bag Report]
+    L --> |If triggered by Git Tag| M[Release, Attach Report]
 
 ```
 
