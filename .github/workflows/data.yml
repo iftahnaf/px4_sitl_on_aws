@@ -58,4 +58,4 @@ jobs:
           git config user.email "github-actions@github.com"
           git add results/*.md
           git commit -m "docs: add bag analysis report from ${{ inputs.bag_file_name }}"
-          git push
+          git push origin main
