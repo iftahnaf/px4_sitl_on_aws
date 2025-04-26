@@ -47,9 +47,16 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
 
+      - name: Install dependencies
+        run: |
+          echo "Installing dependencies..."
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip3 install rosbags matplotlib
+
       - name: Run bag analysis
         run: |
-          python3 ./scripts/bag_analysis.py ./data/${{ inputs.bag_file_name }}
+          python3 ./scripts/report_single.py ./data/${{ inputs.bag_file_name }}
           echo "Analysis complete."
 
       - name: Commit and push analysis result
