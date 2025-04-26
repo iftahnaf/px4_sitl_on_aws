@@ -185,7 +185,7 @@ if __name__ == "__main__":
         "--px4_msgs_path",
         type=str,
         help="Path to the directory containing custom PX4 messages.",
-        default="/workspaces/px4_sitl_on_aws/src/px4_msgs/msg/",
+        default="/workspaces/px4_sitl_on_aws/install/share/px4_msgs/msg",
     )
     args = parser.parse_args()
 
