@@ -62,20 +62,20 @@ class SingleReport:
         self.generate_plots()
         with open(self.report_path, "w") as report_file:
             report_file.write("# 📢 Report 📢\n")
-            report_file.write(f"## 🎒 Bag file: {self.bag_path}\n")
-            report_file.write(f"## 📆 Report generated on: {datetime.now()}\n")
+            report_file.write(f" 🎒 Bag file: **{self.bag_path}**  \n")
+            report_file.write(f" 📆 Report generated on: **{datetime.now()}**\n")
             report_file.write("\n")
             report_file.write("## ✏️ Messages per topic:\n")
             report_file.write("| Topic | Count |\n")
             report_file.write("|-------|-------|\n")
             for topic, count in self.messages_per_topic.items():
-                report_file.write(f"| {topic} | {count} |\n")
+                report_file.write(f"| **{topic}** | **{count}** |\n")
             report_file.write("\n")
             report_file.write("## 📈 Local Position vs time plots:\n")
             report_file.write("### Position\n")
-            report_file.write("![Position](position_local_position.png)\n")
+            report_file.write("![Position](Position_local_position.png)\n")
             report_file.write("### Velocity\n")
-            report_file.write("![Velocity](velocity_local_position.png)\n")
+            report_file.write("![Velocity](Velocity_local_position.png)\n")
             report_file.write("\n")
             report_file.write("## 📉 Trajectory plot:\n")
             report_file.write("![Trajectory](trajectory.png)\n")
@@ -185,7 +185,7 @@ if __name__ == "__main__":
         "--px4_msgs_path",
         type=str,
         help="Path to the directory containing custom PX4 messages.",
-        default="/workspaces/px4_sitl_on_aws/install/share/px4_msgs/msg",
+        default="/workspaces/px4_sitl_on_aws/install",
     )
     args = parser.parse_args()
 
