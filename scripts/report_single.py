@@ -74,16 +74,16 @@ class SingleReport:
             report_file.write("\n")
             report_file.write("## 📈 Local Position vs time plots:\n")
             report_file.write("### Position\n")
-            report_file.write("![Position](Position_local_position.png)\n")
+            report_file.write(f"![Position]({self.bag_path}_Position_local_position.png)\n")
             report_file.write("### Velocity\n")
-            report_file.write("![Velocity](Velocity_local_position.png)\n")
+            report_file.write(f"![Velocity]({self.bag_path}_Velocity_local_position.png)\n")
             report_file.write("\n")
             report_file.write("## 📉 Trajectory plot:\n")
-            report_file.write("![Trajectory](trajectory.png)\n")
+            report_file.write(f"![Trajectory]({self.bag_path}_trajectory.png)\n")
             report_file.write("\n")
             report_file.write("## 📊 Vehicle Status vs time plots:\n")
             report_file.write("### Navigation State\n")
-            report_file.write("![Navigation State](vehicle_status.png)\n")
+            report_file.write(f"![Navigation State]({self.bag_path}_vehicle_status.png)\n")
 
     def generate_plots(self):
         self.generate_plot_local_position_vs_time("position")
@@ -116,7 +116,7 @@ class SingleReport:
         plt.savefig(
             os.path.join(
                 os.path.dirname(self.report_path),
-                f"{plot_description}_local_position.png",
+                f"{self.bag_path}_{plot_description}_local_position.png",
             )
         )
         plt.close()
@@ -129,7 +129,7 @@ class SingleReport:
         plt.title("Trajectory in XY Plane")
         plt.legend()
         plt.grid()
-        plt.savefig(os.path.join(os.path.dirname(self.report_path), "trajectory.png"))
+        plt.savefig(os.path.join(os.path.dirname(self.report_path), f"{self.bag_path}_trajectory.png"))
         plt.close()
 
     def generate_plot_vehicle_status_vs_time(self):
@@ -144,7 +144,7 @@ class SingleReport:
         plt.legend()
         plt.grid()
         plt.savefig(
-            os.path.join(os.path.dirname(self.report_path), "vehicle_status.png")
+            os.path.join(os.path.dirname(self.report_path), f"{self.bag_path}_vehicle_status.png")
         )
         plt.close()
 
