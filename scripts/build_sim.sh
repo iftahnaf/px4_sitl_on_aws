@@ -12,11 +12,7 @@ image="$registry/$repo:$timestamp"
 
 echo "Building image: $image"
 
-docker buildx create --use --name builder || docker buildx use builder
-
-docker buildx build \
-  --cache-from=type=local,src=/tmp/.buildx-cache \
-  --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
+docker build \
   --push \
   -t "$image" \
   -t "$registry/$repo:latest" \
