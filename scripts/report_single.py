@@ -77,7 +77,7 @@ class SingleReport:
         plt.axis('off')
 
         plt.text(
-            0.5, 0.8, "Run Report",
+            0.5, 0.8, "Single Run Report",
             ha='center', va='center',
             fontsize=24,
             fontweight='bold',
