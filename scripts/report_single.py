@@ -10,6 +10,7 @@ from rosbags.rosbag2 import Reader
 from rosbags.typesys.store import Typestore
 import matplotlib.pyplot as plt
 import logging
+import subprocess
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -55,6 +56,7 @@ class SingleReport:
 
         self.read_bag()
         self.generate_report()
+        self.generate_pdf()
         logger.info(f"Report generated at: {self.report_path}")
 
     def generate_report(self):
@@ -145,6 +147,17 @@ class SingleReport:
             os.path.join(os.path.dirname(self.report_path), "vehicle_status.png")
         )
         plt.close()
+
+    def generate_pdf(self):
+        pdf_path = self.report_path.replace(".md", ".pdf")
+        try:
+            subprocess.run(
+                ["pandoc", self.report_path, "-o", pdf_path],
+                check=True,
+            )
+            logger.info(f"PDF report generated at: {pdf_path}")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Failed to generate PDF: {e}")
 
     def read_bag(self):
         with Reader(Path(self.bag_path)) as reader:

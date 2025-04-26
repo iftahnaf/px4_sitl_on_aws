@@ -52,7 +52,7 @@ jobs:
         run: |
           echo "Installing dependencies..."
           sudo apt-get update
-          sudo apt-get install -y python3-pip
+          sudo apt-get install -y python3-pip pandoc
           pip3 install rosbags matplotlib
 
       - name: Run bag analysis
@@ -64,6 +64,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add results/*.md
+          git add results/*.pdf
           git commit -m "docs: add bag analysis report from ${{ inputs.bag_file_name }}"
           git push origin main
