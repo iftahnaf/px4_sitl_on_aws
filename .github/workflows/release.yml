@@ -41,5 +41,6 @@ jobs:
           target_commitish: ${{ steps.get_tag_commit.outputs.commit_sha }}
           generate_release_notes: true
           files: ${{ steps.get_latest_report.outputs.report_path }}
+          prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
