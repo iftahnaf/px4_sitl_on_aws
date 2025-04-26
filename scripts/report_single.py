@@ -84,12 +84,10 @@ class SingleReport:
         )
 
         commit_short = self.commit_id[:8] if self.commit_id not in "N/A" else "N/A"
-        commit_url = f"https://github.com/iftahnaf/px4_sitl_on_aws/commit/{self.commit_id}" if self.commit_id not in "N/A" else ""
-        commit_md = f"[{commit_short}]({commit_url})" if self.commit_id not in "N/A" else "N/A"
         metadata_text = (
             f"Bag File: {os.path.basename(self.bag_path)}\n"
             f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-            f"Commit: {commit_md}\n"
+            f"Commit: {commit_short}\n"
             f"Author: {self.author}\n\n"
         )
 
