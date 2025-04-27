@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2025, Iftach Naftaly <iftahnaf@gmail.com>
+name: Run
+on:
+  workflow_dispatch:
+    inputs:
+      radius:
+        description: "Radius of the circle in meters [10.0, 50.0]"
+        required: true
+        default: 30.0
+        type: number
+
+      altitude:
+        description: "Altitude of the circle in meters [10.0, 50.0]"
+        required: true
+        default: 30.0
+        type: number
+
+      angular_velocity:
+        description: "Angular velocity of the drone in rad/s [0.2, 1.0]"
+        required: true
+        default: 0.5
+        type: number
+
+      duration:
+        description: "Duration of the simulation in seconds [120.0, 300.0]"
+        required: true
+        default: 120.0
+        type: number
+
+      offboard_time_s:
+        description: "Time in seconds to stay in OFFBOARD mode before RTL [10.0, 120.0]"
+        required: true
+        default: 30.0
+        type: number
+
+jobs:
+  sitl:
+    name: Software in the Loop
+    uses: ./.github/workflows/sitl.yml
+    with:
+      radius: ${{ inputs.radius }}
+      altitude: ${{ inputs.altitude }}
+      angular_velocity: ${{ inputs.angular_velocity }}
+      duration: ${{ inputs.duration }}
+      offboard_time_s: ${{ inputs.offboard_time_s }}
+    secrets:
+      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+
+  data:
+    name: Run Bag Analysis
+    uses: ./.github/workflows/data.yml
+    needs: sitl
+    if: always()
+    with:
+      s3_path: ${{ needs.sitl.outputs.s3_path }}
+      bag_file_name: ${{ needs.sitl.outputs.bag_file_name }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
