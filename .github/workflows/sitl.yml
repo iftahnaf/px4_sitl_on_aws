@@ -17,27 +17,27 @@ on:
       radius:
         description: "Radius of the circle in meters [10.0, 50.0]"
         required: true
-        type: number
+        type: string
 
       altitude:
         description: "Altitude of the circle in meters [10.0, 50.0]"
         required: true
-        type: number
+        type: string
 
       angular_velocity:
         description: "Angular velocity of the drone in rad/s [0.2, 1.0]"
         required: true
-        type: number
+        type: string
 
       duration:
         description: "Duration of the simulation in seconds [120.0, 300.0]"
         required: true
-        type: number
+        type: string
 
       offboard_time_s:
         description: "Time in seconds to stay in OFFBOARD mode before RTL [10.0, 120.0]"
         required: true
-        type: number  
+        type: string  
 
     outputs:
       s3_path:
