@@ -34,6 +34,12 @@ jobs:
     uses: ./.github/workflows/sitl.yml
     needs: [wait-for-build]
     if: always()
+    with:
+      radius: 30.0
+      altitude: 30.0
+      angular_velocity: 0.5
+      duration: 120.0
+      offboard_time_s: 30.0
     secrets:
       REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
