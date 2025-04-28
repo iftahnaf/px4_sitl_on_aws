@@ -64,8 +64,9 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+          git -c submodule.recurse=false pull --rebase origin main || true
+          
           git add results/*.pdf
           git commit -m "docs: add bag analysis report from ${{ inputs.bag_file_name }}"
-          git config pull.rebase false
-          git pull
+          
           git push origin main
