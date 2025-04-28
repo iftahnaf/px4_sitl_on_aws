@@ -52,7 +52,7 @@ jobs:
         run: |
           num_ids=${{ inputs.number_of_runs }}
           ids=$(printf "%s\n" $(seq 1 $num_ids) | jq -R . | jq -s .)
-          echo "matrix={\"id\":$ids}" >> $GITHUB_OUTPUT
+          echo "matrix={\"id\":${ids}}" >> $GITHUB_OUTPUT
   sitl:
     name: Software in the Loop
     needs: set-matrix
