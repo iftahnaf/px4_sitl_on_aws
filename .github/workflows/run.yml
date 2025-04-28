@@ -59,13 +59,13 @@ jobs:
             matrix_values="$matrix_values\"$i\""
           done
 
-          echo "matrix={\"id\":[${matrix_values}]}" >> $GITHUB_OUTPUT
+          echo "matrix={\"run_id\":[${matrix_values}]}" >> $GITHUB_OUTPUT
   sitl:
-    name: Software in the Loop
+    name: Software in the Loop (Run ${{ matrix.run_id }})
     needs: set-matrix
     strategy:
       matrix: 
-        id: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
+        run_id: ${{ fromJson(needs.set-matrix.outputs.matrix).run_id }}
     uses: ./.github/workflows/sitl.yml
     with:
       radius: ${{ inputs.radius }}
@@ -73,7 +73,7 @@ jobs:
       angular_velocity: ${{ inputs.angular_velocity }}
       duration: ${{ inputs.duration }}
       offboard_time_s: ${{ inputs.offboard_time_s }}
-      seq: ${{ matrix.id }}
+      seq: ${{ matrix.run_id }}
       on_job_analysis: true
     secrets:
       REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
