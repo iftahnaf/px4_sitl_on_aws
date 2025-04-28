@@ -39,8 +39,8 @@ on:
         required: true
         type: string
 
-      run_id:
-        description: "The ID of the run"
+      seq:
+        description: "The sequence number of the run"
         default: "0"
         type: string
 
@@ -110,8 +110,8 @@ jobs:
         - name: Run the Docker Image
           id: run-sitl
           run: |
-            run_id="${{ inputs.run_id }}"
-            bag_file_name="$(date +"%Y-%m-%d_%H-%M-%S")_${run_id}"
+            seq="${{ inputs.seq }}"
+            bag_file_name="$(date +"%Y-%m-%d_%H-%M-%S")_${seq}"
             echo "Running simulation with the following parameters:"
             echo "Radius: ${{ inputs.radius }}"
             echo "Altitude: ${{ inputs.altitude }}"
