@@ -37,7 +37,17 @@ on:
       offboard_time_s:
         description: "Time in seconds to stay in OFFBOARD mode before RTL [10.0, 120.0]"
         required: true
-        type: string  
+        type: string
+
+      id:
+        description: "The ID of the run"
+        default: "0"
+        type: string
+
+      on_job_analysis:
+        description: "Run the analysis job"
+        default: false
+        type: boolean
 
     outputs:
       s3_path:
@@ -100,7 +110,8 @@ jobs:
         - name: Run the Docker Image
           id: run-sitl
           run: |
-            bag_file_name=$(date +"%Y-%m-%d_%H-%M-%S")
+            id="${{ inputs.id }}"
+            bag_file_name="$(date +"%Y-%m-%d_%H-%M-%S")_${id}"
             echo "Running simulation with the following parameters:"
             echo "Radius: ${{ inputs.radius }}"
             echo "Altitude: ${{ inputs.altitude }}"
@@ -164,3 +175,17 @@ jobs:
             github-token: ${{ secrets.REPO_TOKEN }}
             label: ${{ needs.start-runner.outputs.label }}
             ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
+
+    data:
+      name: Run Bag Analysis
+      uses: ./.github/workflows/data.yml
+      needs: [do-the-job]
+      if: ${{ inputs.on_job_analysis }}
+      with:
+        s3_path: ${{ needs.do-the-job.outputs.s3_path }}
+        bag_file_name: ${{ needs.do-the-job.outputs.bag_file_name }}
+      secrets:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
