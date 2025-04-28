@@ -39,7 +39,7 @@ on:
         required: true
         type: string
 
-      id:
+      run_id:
         description: "The ID of the run"
         default: "0"
         type: string
@@ -110,8 +110,8 @@ jobs:
         - name: Run the Docker Image
           id: run-sitl
           run: |
-            id="${{ inputs.id }}"
-            bag_file_name="$(date +"%Y-%m-%d_%H-%M-%S")_${id}"
+            run_id="${{ inputs.run_id }}"
+            bag_file_name="$(date +"%Y-%m-%d_%H-%M-%S")_${run_id}"
             echo "Running simulation with the following parameters:"
             echo "Radius: ${{ inputs.radius }}"
             echo "Altitude: ${{ inputs.altitude }}"

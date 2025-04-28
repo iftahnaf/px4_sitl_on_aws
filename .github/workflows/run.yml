@@ -73,7 +73,7 @@ jobs:
       angular_velocity: ${{ inputs.angular_velocity }}
       duration: ${{ inputs.duration }}
       offboard_time_s: ${{ inputs.offboard_time_s }}
-      id: ${{ matrix.id }}
+      run_id: ${{ matrix.id }}
       on_job_analysis: true
     secrets:
       REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
