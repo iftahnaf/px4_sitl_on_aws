@@ -189,7 +189,7 @@ jobs:
       with:
         s3_path: ${{ needs.do-the-job.outputs.s3_path }}
         bag_file_name: ${{ needs.do-the-job.outputs.bag_file_name }}
-        multi_run: ${{ inputs.number_of_runs != '1' && 'true' || 'false' }}
+        multi_run: ${{ inputs.number_of_runs != '1' && true || false }}
       secrets:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
