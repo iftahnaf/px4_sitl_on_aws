@@ -78,10 +78,10 @@ jobs:
             git config user.name "github-actions"
             git config user.email "github-actions@github.com"
 
-            git fetch origin main
-            git reset --hard origin/main
+            # Do not fetch/reset entire repo, just update submodules shallowly (or skip them entirely)
+            git config --global submodule.recurse false
+            git pull --rebase --no-recurse-submodules origin main
 
             git add results/*.pdf
-            git commit -m "docs: add bag analysis report from ${{ inputs.bag_file_name }}"
-            
+            git commit -m "docs: add bag analysis report from ${{ inputs.bag_file_name }}" || echo "Nothing to commit"
             git push origin HEAD:main
