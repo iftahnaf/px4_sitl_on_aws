@@ -88,7 +88,7 @@ jobs:
       needs: start-runner
       runs-on: ${{ needs.start-runner.outputs.label }}
       outputs:
-        s3_path: ${{ steps.set-output.outputs.s3_path }}
+        s3_path: ${{ steps.upload-bags.outputs.s3_path }}
         bag_file_name: ${{ steps.set-bag-file-name.outputs.bag_file_name }}
       steps:
 
@@ -101,6 +101,13 @@ jobs:
             
         - name: Login to Amazon ECR
           uses: aws-actions/amazon-ecr-login@v2
+
+        - name: Install AWS CLI
+          uses: unfor19/install-aws-cli-action@v1
+          with:
+            version: 2
+            verbose: false
+            arch: amd64
 
         - name: Pull the Docker Image
           run: |
@@ -136,19 +143,14 @@ jobs:
             cat ~/bags/topic_report.md
             current_time=$(date +"%Y-%m-%d_%H-%M-%S")
             mv ~/bags/topic_report.md ~/bags/topic_report_${current_time}.md
-            
-        - name: Install AWS CLI and upload the bags
-          run: |
-              sudo apt-get update
-              sudo apt-get install -y curl unzip zip
-              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-              unzip awscliv2.zip
-              sudo ./aws/install
 
-              current_time=$(date +"%Y-%m-%d_%H-%M-%S")
-              export S3_FOLDER=px4-sitl-on-aws-bags/$current_time/
-              aws s3 cp ~/bags "s3://$S3_FOLDER" --recursive
-              echo "s3_path=s3://$S3_FOLDER" >> "$GITHUB_OUTPUT"
+        - name: Upload the bags to S3
+          id: upload-bags
+          run: |
+            current_time=$(date +"%Y-%m-%d_%H-%M-%S")
+            export S3_FOLDER=px4-sitl-on-aws-bags/$current_time/
+            aws s3 cp ~/bags "s3://$S3_FOLDER" --recursive
+            echo "s3_path=s3://$S3_FOLDER" >> "$GITHUB_OUTPUT"
 
         - name: Set bag file name output
           id: set-bag-file-name
