@@ -62,7 +62,7 @@ jobs:
           sudo apt-get install -y python3-pip
           pip3 install rosbags matplotlib
 
-      - name: Run Single bag analysis
+      - name: Run single bag analysis
         if: ${{ inputs.multi_run == false }}
         run: |
           python3 ./scripts/report_single.py ./data/${{ inputs.bag_file_name }} --commit_id ${{ github.sha }} --author ${{ github.actor }}
@@ -73,15 +73,9 @@ jobs:
           python3 ./scripts/report_multi.py ./data/${{ inputs.s3_path }} --commit_id ${{ github.sha }} --author ${{ github.actor }}
           echo "Analysis complete."
 
-      - name: Commit and push analysis result
-        run: |
-            git config user.name "github-actions"
-            git config user.email "github-actions@github.com"
-
-            # Do not fetch/reset entire repo, just update submodules shallowly (or skip them entirely)
-            git config --global submodule.recurse false
-            git pull --rebase --no-recurse-submodules origin main
-
-            git add results/*.pdf
-            git commit -m "docs: add bag analysis report from ${{ inputs.bag_file_name }}" || echo "Nothing to commit"
-            git push origin HEAD:main
+      - name: Upload to Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uploaded-artifact
+          path: results/*.pdf
+          if-no-files-found: error
