@@ -11,6 +11,9 @@ on:
       bag_file_name:
         required: true
         type: string
+      multi_run:
+        type: boolean
+        default: false
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -41,8 +44,12 @@ jobs:
       - name: Download latest bag file from S3
         run: |
           mkdir -p data
-          echo "Downloading latest version bag file from S3..."
-          aws s3 cp "${{ inputs.s3_path }}${{ inputs.bag_file_name }}" ./data/${{ inputs.bag_file_name }} --recursive
+          echo "Downloading bag files from S3..."
+          if [ "${{ inputs.multi_run }}" = "true" ]; then
+            aws s3 cp "${{ inputs.s3_path }}" ./data --recursive
+          else
+            aws s3 cp "${{ inputs.s3_path }}${{ inputs.bag_file_name }}" ./data/${{ inputs.bag_file_name }} --recursive
+          fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -55,24 +62,26 @@ jobs:
           sudo apt-get install -y python3-pip
           pip3 install rosbags matplotlib
 
-      - name: Run bag analysis
+      - name: Run Single bag analysis
+        if: ${{ inputs.multi_run == false }}
         run: |
           python3 ./scripts/report_single.py ./data/${{ inputs.bag_file_name }} --commit_id ${{ github.sha }} --author ${{ github.actor }}
+          echo "Analysis complete."
+      - name: Run Multi bag analysis
+        if: ${{ inputs.multi_run == true }}
+        run: |
+          python3 ./scripts/report_multi.py ./data/${{ inputs.s3_path }} --commit_id ${{ github.sha }} --author ${{ github.actor }}
           echo "Analysis complete."
 
       - name: Commit and push analysis result
         run: |
             git config user.name "github-actions"
             git config user.email "github-actions@github.com"
-            git -c submodule.recurse=false pull --rebase origin main || true
+
+            git fetch origin main
+            git reset --hard origin/main
 
             git add results/*.pdf
             git commit -m "docs: add bag analysis report from ${{ inputs.bag_file_name }}"
-
-            git push origin main || (
-              echo "First push failed, pulling latest changes and retrying..." &&
-              git -c submodule.recurse=false pull --rebase origin main &&
-              git rebase &&
-              sleep 3 &&
-              git push origin main
-            )
+            
+            git push origin HEAD:main

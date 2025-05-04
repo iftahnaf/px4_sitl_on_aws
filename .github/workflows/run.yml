@@ -76,6 +76,7 @@ jobs:
       offboard_time_s: ${{ inputs.offboard_time_s }}
       seq: ${{ matrix.run_id }}
       on_job_analysis: true
+      number_of_runs: ${{ inputs.number_of_runs }}
     secrets:
       REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

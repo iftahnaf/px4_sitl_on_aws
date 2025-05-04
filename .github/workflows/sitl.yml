@@ -41,13 +41,18 @@ on:
 
       seq:
         description: "The sequence number of the run"
-        default: "0"
+        default: "1"
         type: string
 
       on_job_analysis:
         description: "Run the analysis job"
         default: false
         type: boolean
+      
+      number_of_runs:
+        description: "Number of runs to perform"
+        default: "1"
+        type: string
 
     outputs:
       s3_path:
@@ -180,10 +185,11 @@ jobs:
       name: Run Bag Analysis
       uses: ./.github/workflows/data.yml
       needs: [do-the-job]
-      if: ${{ inputs.on_job_analysis }}
+      if: ${{ inputs.on_job_analysis && (inputs.number_of_runs == inputs.seq) }}
       with:
         s3_path: ${{ needs.do-the-job.outputs.s3_path }}
         bag_file_name: ${{ needs.do-the-job.outputs.bag_file_name }}
+        multi_run: ${{ inputs.number_of_runs != '1' && 'true' || 'false' }}
       secrets:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
