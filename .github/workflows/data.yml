@@ -41,14 +41,15 @@ jobs:
           verbose: false
           arch: amd64
 
-      - name: Download latest bag file from S3
+      - name: Download latest bag file from the cloud
         run: |
           mkdir -p data
-          echo "Downloading bag files from S3..."
           if [ "${{ inputs.multi_run }}" = "true" ]; then
             aws s3 cp "${{ inputs.bag_path }}" ./data --recursive
+            echo "Downloaded all bag files from S3, folder: ${{ inputs.bag_path }}"
           else
             aws s3 cp "${{ inputs.bag_path }}${{ inputs.bag_file_name }}" ./data/${{ inputs.bag_file_name }} --recursive
+            echo "Downloaded single bag file from S3, file: ${{ inputs.bag_file_name }}"
           fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
