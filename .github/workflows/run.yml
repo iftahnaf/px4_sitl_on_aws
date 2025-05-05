@@ -60,9 +60,19 @@ jobs:
           done
 
           echo "matrix={\"run_id\":[${matrix_values}]}" >> $GITHUB_OUTPUT
+
+  set-timestamp:
+    runs-on: ubuntu-latest
+    outputs:
+      folder: ${{ steps.timestamp.outputs.folder }}
+    steps:
+      - id: timestamp
+        run: |
+          echo "folder=px4-sitl-on-aws-bags/$(date +'%Y-%m-%d_%H-%M-%S')" >> "$GITHUB_OUTPUT"
+        
   sitl:
     name: Software in the Loop (Run ${{ matrix.run_id }})
-    needs: set-matrix
+    needs: [set-matrix, set-timestamp]
     strategy:
       max-parallel: 4
       matrix: 
@@ -77,6 +87,7 @@ jobs:
       seq: ${{ matrix.run_id }}
       on_job_analysis: true
       number_of_runs: ${{ inputs.number_of_runs }}
+      parent_folder: ${{ needs.set-timestamp.outputs.folder }}
     secrets:
       REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

@@ -54,10 +54,15 @@ on:
         default: "1"
         type: string
 
+      parent_folder:
+        description: "The parent folder for the bag files"
+        default: "px4-sitl-on-aws-bags"
+        type: string
+
     outputs:
-      s3_path:
-        description: "The full S3 path to the uploaded bag"
-        value: ${{ jobs.do-the-job.outputs.s3_path }}
+      bag_path:
+        description: "The full path to the uploaded bag"
+        value: ${{ jobs.do-the-job.outputs.bag_path }}
       bag_file_name:
         description: "The name of the bag file"
         value: ${{ jobs.do-the-job.outputs.bag_file_name }}
@@ -93,7 +98,7 @@ jobs:
       needs: start-runner
       runs-on: ${{ needs.start-runner.outputs.label }}
       outputs:
-        s3_path: ${{ steps.upload-bags.outputs.s3_path }}
+        bag_path: ${{ steps.upload-bags.outputs.bag_path }}
         bag_file_name: ${{ steps.set-bag-file-name.outputs.bag_file_name }}
       steps:
 
@@ -136,11 +141,9 @@ jobs:
                   718459739973.dkr.ecr.eu-west-1.amazonaws.com/px4_sitl_on_aws:latest
             echo "bag_file_name=$bag_file_name" >> "$GITHUB_OUTPUT"
 
-        - name: Topic Report
+        - name: Print Topic Report
           run: |
-            cat ~/bags/topic_report.md
-            current_time=$(date +"%Y-%m-%d_%H-%M-%S")
-            mv ~/bags/topic_report.md ~/bags/topic_report_${current_time}.md
+            cat ~/bags/topic_report.md            
 
         - name: Upload the bags to S3
           id: upload-bags
@@ -151,9 +154,10 @@ jobs:
             unzip awscliv2.zip
             sudo ./aws/install
             current_time=$(date +"%Y-%m-%d_%H-%M-%S")
-            export S3_FOLDER=px4-sitl-on-aws-bags/$current_time/
+            mv ~/bags/topic_report.md ~/bags/topic_report_${current_time}.md
+            export S3_FOLDER=${{ inputs.parent_folder }}/$current_time/
             aws s3 cp ~/bags "s3://$S3_FOLDER" --recursive
-            echo "s3_path=s3://$S3_FOLDER" >> "$GITHUB_OUTPUT"
+            echo "bag_path=s3://$S3_FOLDER" >> "$GITHUB_OUTPUT"
 
         - name: Set bag file name output
           id: set-bag-file-name
@@ -187,7 +191,7 @@ jobs:
       needs: [do-the-job]
       if: ${{ inputs.on_job_analysis && (inputs.number_of_runs == inputs.seq) }}
       with:
-        s3_path: ${{ needs.do-the-job.outputs.s3_path }}
+        bag_path: ${{ needs.do-the-job.outputs.bag_path }}
         bag_file_name: ${{ needs.do-the-job.outputs.bag_file_name }}
         multi_run: ${{ inputs.number_of_runs != '1' && true || false }}
       secrets:
