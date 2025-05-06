@@ -155,7 +155,7 @@ jobs:
             sudo ./aws/install
             current_time=$(date +"%Y-%m-%d_%H-%M-%S")
             mv ~/bags/topic_report.md ~/bags/topic_report_${current_time}.md
-            export S3_FOLDER=${{ inputs.parent_folder }}/$current_time/
+            export S3_FOLDER=${{ inputs.parent_folder }}/
             aws s3 cp ~/bags "s3://$S3_FOLDER" --recursive
             echo "bag_path=s3://${{ inputs.parent_folder }}" >> "$GITHUB_OUTPUT"
 
