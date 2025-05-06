@@ -48,7 +48,7 @@ jobs:
             aws s3 cp "${{ inputs.bag_path }}" ./data --recursive
             echo "Downloaded all bag files from S3, folder: ${{ inputs.bag_path }}"
           else
-            aws s3 cp "${{ inputs.bag_path }}${{ inputs.bag_file_name }}" ./data/${{ inputs.bag_file_name }} --recursive
+            aws s3 cp "${{ inputs.bag_path }}/${{ inputs.bag_file_name }}" ./data/${{ inputs.bag_file_name }} --recursive
             echo "Downloaded single bag file from S3, file: ${{ inputs.bag_file_name }}"
           fi
         env:
