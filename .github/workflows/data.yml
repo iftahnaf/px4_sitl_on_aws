@@ -72,7 +72,7 @@ jobs:
         if: ${{ inputs.multi_run == true }}
         run: |
           folder_name=$(basename "${{ inputs.bag_path }}")
-          python3 ./scripts/report_multi.py ./data/$folder_name --commit_id ${{ github.sha }} --author ${{ github.actor }}
+          python3 ./scripts/report_multi.py ./data/ --commit_id ${{ github.sha }} --author ${{ github.actor }}
           echo "Analysis complete."
 
       - name: Upload to Artifact
