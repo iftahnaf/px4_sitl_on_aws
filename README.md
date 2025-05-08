@@ -18,18 +18,18 @@ Once the simulation ends, a simple analysis script runs to count the number of m
 
 ```mermaid
 flowchart TB
-    A[Manual Dispatch] --> C[GitHub Actions Triggered]
+    A[Manual Dispatch] --> C[Pipeline Triggered]
     B[New Git Tag] --> C
     C --> D[Build New Docker Image]
     D --> E[Push Image to AWS ECR]
+    C --Manual Dispatch--> F[Push Image to AWS ECR]
     E --> F[Launch EC2 Instance]
     F --> G[Pull Docker Image from ECR]
     G --> H[Run PX4 SITL Simulation]
-    H --> I[Run Topic Analysis]
-    I --> J[Upload ROS 2 Bag File to S3]
-    J --> K[Terminate EC2 Instance]
-    K --> L[Generate Bag Report]
-    L --> |If triggered by Git Tag| M[Release, Attach Report]
+    H --> I[Upload ROS 2 Bag File to S3]
+    I --> J[Terminate EC2 Instance]
+    J --> K[Generate Bag Report as Workflow's Artifact]
+    K --> |If Triggered by Git Tag| M[Release]
 
 ```
 

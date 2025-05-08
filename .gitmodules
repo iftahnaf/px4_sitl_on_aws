@@ -4,7 +4,7 @@
 
 [submodule "PX4-Autopilot"]
     path = PX4-Autopilot
-    url = https://github.com/iftahnaf/PX4-Autopilot.git
+	url = https://github.com/PX4/PX4-Autopilot.git
 
 [submodule "src/px4-offboard"]
     path = src/px4-offboard
