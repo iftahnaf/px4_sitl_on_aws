@@ -127,5 +127,6 @@
         "Iftach",
         "Naftaly",
         "sitl"
-    ]
+    ],
+    "cmake.sourceDirectory": "/workspaces/px4_sitl_on_aws/PX4-Autopilot"
 }
