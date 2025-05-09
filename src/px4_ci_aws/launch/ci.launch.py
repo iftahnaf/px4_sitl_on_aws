@@ -173,7 +173,7 @@ def generate_launch_description():
             namespace='px4_offboard',
             executable='offboard_control',
             name='control',
-            parameters= [{'radius': radius},{'altitude': altitude},{'omega': omega}]
+            parameters= [{'radius': float(radius)},{'altitude': float(altitude)},{'omega': float(omega)}]
         )
     
     bag_path = f'/bags/{bag_name}'
