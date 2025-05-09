@@ -20,6 +20,7 @@ import time
 import os
 import signal
 import datetime
+import numpy as np
 from launch import LaunchContext
 
 from rosbags.highlevel import AnyReader
@@ -101,13 +102,18 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
             f.write("\n".join(lines))
 
         logging.info(f"Markdown report written to {report_path}")
+        
+radius_mean = 30.0
 
-radius = safe_float("RADIUS", 10.0)
+radius_std = safe_float("RADIUS", 0.0)
 altitude = safe_float("ALTITUDE", 30.0)
 omega = safe_float("OMEGA", 0.5)
 timeout_s = safe_float("TIMEOUT_S", 120.0)
 offboard_time_s = safe_float("OFFBOARD_TIME_S", 30.0)
 bag_name = os.environ.get("BAG_NAME", "latest")
+
+radius = np.random.normal(radius_mean, radius_std)
+radius = np.clip(radius, 10.0, 60.0)
 
 logging.info(f"Radius: {radius}")
 logging.info(f"Altitude: {altitude}")
