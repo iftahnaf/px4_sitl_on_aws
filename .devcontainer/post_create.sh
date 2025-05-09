@@ -16,9 +16,13 @@ echo "Installing PX4 dependencies"
 
 ## build
 echo "Building PX4"
+git checkout main
 git remote add upstream https://github.com/PX4/PX4-Autopilot.git
 git fetch upstream
 git fetch upstream --tags
+git submodule sync
+git submodule update --init --recursive
+git checkout main
 make px4_sitl
 
 ## compile ROS workspace
