@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       radius:
-        description: "Radius of the circle in meters [10.0, 50.0]"
+        description: "Radius STD of the circle in meters (mean is 10.0 [m])"
         required: true
-        default: 30.0
+        default: 2.0
         type: number
 
       altitude:
