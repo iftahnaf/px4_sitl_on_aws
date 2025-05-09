@@ -35,7 +35,7 @@ jobs:
     needs: [wait-for-build]
     if: always()
     with:
-      radius: 30.0
+      radius: 1.0
       altitude: 30.0
       angular_velocity: 0.5
       duration: 120.0
