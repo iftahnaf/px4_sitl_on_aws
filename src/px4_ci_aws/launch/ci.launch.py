@@ -103,7 +103,7 @@ def post_process(context: LaunchContext, arg1: LaunchConfiguration, bag_name: st
 
         logging.info(f"Markdown report written to {report_path}")
         
-radius_mean = 10.0
+radius_mean = 30.0
 
 radius_std = safe_float("RADIUS", 0.0)
 altitude = safe_float("ALTITUDE", 30.0)
@@ -113,7 +113,7 @@ offboard_time_s = safe_float("OFFBOARD_TIME_S", 30.0)
 bag_name = os.environ.get("BAG_NAME", "latest")
 
 radius = np.random.normal(radius_mean, radius_std)
-radius = np.clip(radius, 5.0, 20.0)
+radius = np.clip(radius, 10.0, 60.0)
 
 logging.info(f"Radius: {radius}")
 logging.info(f"Altitude: {altitude}")
