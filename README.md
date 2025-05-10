@@ -15,7 +15,7 @@ Whenever [CI Workflow](./.github/workflows/ci.yml) triggered, a new Docker image
 
 Once the simulation ends, a simple analysis script runs to count the number of messages per topic, helping to detect bugs or anomalies. Finally, the ROS 2 bag file that was recorded during the simulation is uploaded to an S3 bucket for storage and later analysis.
 ![CI Demo](docs/ci.gif)
-***Watch again on [YouTube](https://youtu.be/nR7EMzalkKk)***
+***Watch again on [YouTube](https://youtu.be/nR7EMzalkKk).***
 
 Multiple parallel simulations can be launched from the GitHub Actions UI:
 The [Run](./.github/workflows/run.yml) workflow can be manually dispatched with several simulation parameters, including the number of simulations. Each scenario will generate a random radius based on the specified radius standard deviation (STD) parameter and will be launched on a separate EC2 instance.
