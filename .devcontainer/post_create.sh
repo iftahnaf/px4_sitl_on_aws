@@ -23,7 +23,7 @@ git fetch upstream --tags
 git submodule sync
 git submodule update --init --recursive
 git checkout main
-bash ../scripts/workspaces/px4_sitl_on_aws/scripts/update_nav_dll_act.py
+python3 /workspaces/px4_sitl_on_aws/scripts//update_nav_dll_act.py
 make px4_sitl
 
 ## compile ROS workspace
