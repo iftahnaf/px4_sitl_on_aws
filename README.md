@@ -14,6 +14,7 @@ This repository demonstrates an automated workflow for running PX4 SITL (Softwar
 Whenever [CI Workflow](./.github/workflows/ci.yml) triggered, a new Docker image is built (only if necessary), containing the required environment to run the SITL simulation. Then, an EC2 instance is launched, pulls the simulation Docker image from ECR, and runs the scenario.
 
 Once the simulation ends, a simple analysis script runs to count the number of messages per topic, helping to detect bugs or anomalies. Finally, the ROS 2 bag file that was recorded during the simulation is uploaded to an S3 bucket for storage and later analysis.
+![CI Demo](docs/ci.gif)
 
 Multiple parallel simulations can be launched from the GitHub Actions UI:
 The [Run](./.github/workflows/run.yml) workflow can be manually dispatched with several simulation parameters, including the number of simulations. Each scenario will generate a random radius based on the specified radius standard deviation (STD) parameter and will be launched on a separate EC2 instance.
