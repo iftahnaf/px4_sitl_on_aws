@@ -19,12 +19,7 @@ Multiple parallel simulations can be launched from the GitHub Actions UI:
 The [Run](./.github/workflows/run.yml) workflow can be manually dispatched with several simulation parameters, including the number of simulations. Each scenario will generate a random radius based on the specified radius standard deviation (STD) parameter and will be launched on a separate EC2 instance.
 At the end of the simulation, an analysis script will download the simulation bag files from S3 and generate an X-Y trajectory report.
 
-<iframe width="560" height="315" 
-        src="https://www.youtube.com/embed/_BJRmg2FJDs" 
-        frameborder="0" 
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-        allowfullscreen>
-</iframe>
+[![Watch the video](https://img.youtube.com/vi/_BJRmg2FJDs/hqdefault.jpg)](https://www.youtube.com/watch?v=_BJRmg2FJDs)
 
 ```mermaid
 flowchart TB
