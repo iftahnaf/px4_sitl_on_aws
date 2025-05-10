@@ -40,6 +40,6 @@ sudo chmod 0700 /run/user/1000
 sudo mkdir /bags/
 sudo chown ros:ros /bags/
 
-echo "source /venv/bin/activate" >> ~/.bashrc
+pip install rosbags --break-system-packages
 
 echo "Done installing, ready to develop!"
