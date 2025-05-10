@@ -20,6 +20,8 @@ The [Run](./.github/workflows/run.yml) workflow can be manually dispatched with 
 At the end of the simulation, an analysis script will download the simulation bag files from S3 and generate an X-Y trajectory report.
 
 ![PX4 SITL Demo](docs/px4_sitl_on_aws.gif)
+**Watch again on [YouTube](https://www.youtube.com/watch?v=_BJRmg2FJDs&ab_channel=IftachNaftaly).**
+
 
 ```mermaid
 flowchart TB
