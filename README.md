@@ -26,7 +26,7 @@ At the end of the simulation, an analysis script will download the simulation ba
 ![PX4 SITL Demo](docs/px4_sitl_on_aws.gif)
 ***Watch again on [YouTube](https://www.youtube.com/watch?v=_BJRmg2FJDs&ab_channel=IftachNaftaly).***
 
-## Behind the Scene
+# Behind the Scene
 
 ```mermaid
 flowchart TB
@@ -45,7 +45,7 @@ flowchart TB
 
 ```
 
-## 	Repository Contents
+# 	Repository Contents
 
 This repository contains:
 
@@ -59,7 +59,7 @@ This repository contains:
 
 ---
 
-## Repository Structure
+# Repository Structure
 
 ```graphql
 p4_sitl_on_aws/ 
@@ -73,7 +73,7 @@ p4_sitl_on_aws/
 |── PX4-Autopilot # 
 ```
 
-## Use Case
+# Use Case
 
 This repository provides an infrastructure example for:
 
@@ -84,7 +84,7 @@ This repository provides an infrastructure example for:
 
 ---
 
-## AWS Resources Required
+# AWS Resources Required
 
 | Resource        | Purpose                            | Example Name                |
 |----------------|------------------------------------|-----------------------------|
@@ -97,7 +97,7 @@ This repository provides an infrastructure example for:
 ---
 
 
-## Documentation
+# Documentation
 
 See [Wiki](https://github.com/iftahnaf/px4_sitl_on_aws/wiki)
 
