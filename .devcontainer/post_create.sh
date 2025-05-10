@@ -23,6 +23,7 @@ git fetch upstream --tags
 git submodule sync
 git submodule update --init --recursive
 git checkout main
+bash ../scripts/workspaces/px4_sitl_on_aws/scripts/update_nav_dll_act.py
 make px4_sitl
 
 ## compile ROS workspace
@@ -36,5 +37,9 @@ echo "source ${WORKSPACE_DIR}install/local_setup.bash" >> ~/.bashrc
 sudo mkdir /run/user/1000
 sudo chown ros:ros /run/user/1000
 sudo chmod 0700 /run/user/1000
+sudo mkdir /bags/
+sudo chown ros:ros /bags/
+
+echo "source /venv/bin/activate" >> ~/.bashrc
 
 echo "Done installing, ready to develop!"
