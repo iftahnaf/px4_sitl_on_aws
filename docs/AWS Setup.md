@@ -2,6 +2,8 @@
 
 This guide explains how to configure AWS resources to run PX4 SITL simulations using EC2, ECR, and S3 — controlled from GitHub Actions.
 
+> **💡 Tip:** Follow [ec2-github-runner](https://github.com/machulav/ec2-github-runner) repository.
+
 ---
 
 ## VPC Setup

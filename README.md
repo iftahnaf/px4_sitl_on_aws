@@ -26,7 +26,7 @@ At the end of the simulation, an analysis script will download the simulation ba
 ![PX4 SITL Demo](docs/px4_sitl_on_aws.gif)
 ***Watch again on [YouTube](https://www.youtube.com/watch?v=_BJRmg2FJDs&ab_channel=IftachNaftaly).***
 
-# Behind the Scene
+# Workflow Diagram
 
 ```mermaid
 flowchart TB
