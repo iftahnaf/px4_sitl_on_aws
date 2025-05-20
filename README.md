@@ -9,6 +9,8 @@
 
 # PX4 SITL on AWS — Automated Simulation & Testing Pipeline
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/iftahnaf/px4_sitl_on_aws)
+
 This repository demonstrates an automated workflow for running PX4 SITL (Software-In-The-Loop) simulations on AWS infrastructure — fully managed by GitHub Actions.
 
 ## GitHub Actions UI as SITL Simulation Manager
