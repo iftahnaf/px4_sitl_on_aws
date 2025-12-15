@@ -76,7 +76,7 @@ jobs:
           echo "Analysis complete."
 
       - name: Upload to Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Report
           path: results/*.pdf
