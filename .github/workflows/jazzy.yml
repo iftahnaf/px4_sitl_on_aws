@@ -22,7 +22,7 @@ jobs:
     needs: label
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Check if source label is present
         id: check
